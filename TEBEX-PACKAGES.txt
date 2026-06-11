@@ -111,8 +111,8 @@ Tebex dashboard -> Payments -> Queue -> retry failed commands
 
 --- LINK STORE TO rexsmp.com ---
 
-After packages exist, copy your store URL (e.g. https://rexsmp.tebex.io)
-Send it to update website Store buttons, or edit index.html yourself.
+After packages exist, your store URL is:
+  https://rex-smp.tebex.io
 
 --- REGENERATE SECRET KEY ---
 

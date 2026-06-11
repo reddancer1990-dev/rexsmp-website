@@ -599,6 +599,12 @@ body {
 }
 
 /* Store */
+.store-actions {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 2rem;
+}
+
 .store-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
@@ -667,6 +673,15 @@ body {
   margin-top: 1.5rem;
   font-size: 0.85rem;
   color: var(--grey-500);
+}
+
+.store-note a {
+  color: var(--red-light);
+  text-decoration: none;
+}
+
+.store-note a:hover {
+  text-decoration: underline;
 }
 
 /* Discord */
