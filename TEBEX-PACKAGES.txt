@@ -1,0 +1,121 @@
+REX SMP — TEBEX PACKAGES (copy into creator.tebex.io)
+=====================================================
+
+Before creating packages:
+  1. Server console: tebex secret YOUR_KEY  (already done if /tebex works)
+  2. Tebex -> Packages -> Create Package
+  3. Delivery type: GAME SERVER COMMANDS (runs as console)
+  4. Always use {username} — Tebex replaces with buyer's Minecraft name
+
+Test each package once in TEST MODE before going live.
+
+
+--- RANKS (Category: Ranks) ---
+
+Package: Rex+ (30 Days)
+  Price: set yourself (e.g. $4.99)
+  Type: Subscription / 30 days if Tebex offers it
+  Commands on purchase:
+    lp user {username} parent addtemp rexplus 30d
+  Commands on expiry (if subscription):
+    lp user {username} parent remove rexplus
+
+Package: Rex++ (30 Days)
+  Price: set yourself (e.g. $9.99)
+  Commands on purchase:
+    lp user {username} parent addtemp rexplusplus 30d
+  Commands on expiry:
+    lp user {username} parent remove rexplusplus
+
+
+--- REXSHARDS (Category: RexShards) ---
+
+Package: 500 RexShards
+  Commands:
+    points give {username} 500
+
+Package: 1,000 RexShards
+  Commands:
+    points give {username} 1000
+
+Package: 2,500 RexShards
+  Commands:
+    points give {username} 2500
+
+Package: 5,000 RexShards
+  Commands:
+    points give {username} 5000
+
+Package: 10,000 RexShards
+  Commands:
+    points give {username} 10000
+
+
+--- CRATE KEYS (Category: Keys) ---
+
+Key IDs on your server: common, rare, legendary
+
+Package: 1x Common Key
+  Commands:
+    crates key give {username} common 1
+
+Package: 3x Common Key
+  Commands:
+    crates key give {username} common 3
+
+Package: 1x Rare Key
+  Commands:
+    crates key give {username} rare 1
+
+Package: 3x Rare Key
+  Commands:
+    crates key give {username} rare 3
+
+Package: 1x Legendary Key
+  Commands:
+    crates key give {username} legendary 1
+
+Package: 3x Legendary Key
+  Commands:
+    crates key give {username} legendary 3
+
+
+--- BUNDLES (Category: Bundles) — optional ---
+
+Package: Starter Bundle
+  Description: 1000 RexShards + 1 Rare Key + 1 Common Key
+  Commands (one per line):
+    points give {username} 1000
+    crates key give {username} rare 1
+    crates key give {username} common 1
+
+Package: Legend Bundle
+  Commands:
+    points give {username} 5000
+    crates key give {username} legendary 1
+    crates key give {username} rare 2
+
+
+--- IF A COMMAND FAILS ---
+
+Check in-game as OP first (replace YourName):
+  points give YourName 100
+  crates key give YourName common 1
+  lp user YourName parent addtemp rexplus 30d
+
+If keys fail, try:
+  excellentcrates key give {username} common 1
+
+Tebex dashboard -> Payments -> Queue -> retry failed commands
+
+
+--- LINK STORE TO rexsmp.com ---
+
+After packages exist, copy your store URL (e.g. https://rexsmp.tebex.io)
+Send it to update website Store buttons, or edit index.html yourself.
+
+--- REGENERATE SECRET KEY ---
+
+If your tebex secret was shared publicly:
+  Tebex -> Game Servers -> Regenerate key
+  Console: tebex secret NEW_KEY
