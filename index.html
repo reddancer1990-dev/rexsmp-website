@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Rex SMP — Donut-style survival. Raids ON. Java + Bedrock crossplay. Survive. Raid. Conquer.">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta name="robots" content="index, follow">
+  <meta name="theme-color" content="#aa0000">
+  <link rel="canonical" href="https://rexsmp.com/">
+  <title>Rex SMP | rexsmp.com</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✦</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="bg-glow" aria-hidden="true"></div>
+  <div class="bg-grid" aria-hidden="true"></div>
+
+  <nav class="nav">
+    <a class="nav-brand" href="#">
+      <span class="brand-star">✦</span>
+      <span>REX SMP</span>
+    </a>
+    <div class="nav-links">
+      <a href="#stats">Stats</a>
+      <a href="#join">How To Join</a>
+      <a href="#features">Features</a>
+      <a href="#store">Store</a>
+      <a class="nav-discord" href="https://discord.gg/rexsmp" target="_blank" rel="noopener">Discord</a>
+    </div>
+    <button class="nav-toggle" type="button" aria-label="Menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <header class="hero" id="top">
+    <div class="hero-badge">rexsmp.com · New Season · Raids ON · Java + Bedrock</div>
+    <h1 class="hero-title">
+      <span class="title-line">REX</span>
+      <span class="title-line title-accent">SMP</span>
+    </h1>
+    <p class="hero-tagline">Survive. Raid. Conquer.</p>
+
+    <div class="ip-card">
+      <div class="ip-row">
+        <div class="ip-info">
+          <span class="ip-label">Java</span>
+          <code class="ip-value" id="java-ip">rexsmp.simpleminecrafthosting.com</code>
+        </div>
+        <button class="copy-btn" type="button" data-copy="rexsmp.simpleminecrafthosting.com" aria-label="Copy Java IP">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          Copy
+        </button>
+      </div>
+      <div class="ip-divider"></div>
+      <div class="ip-row">
+        <div class="ip-info">
+          <span class="ip-label">Bedrock</span>
+          <code class="ip-value" id="bedrock-ip">69.41.172.83 · Port 25691</code>
+        </div>
+        <button class="copy-btn" type="button" data-copy="69.41.172.83:25691" aria-label="Copy Bedrock IP">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          Copy
+        </button>
+      </div>
+    </div>
+
+    <div class="hero-actions">
+      <a class="btn btn-primary" href="#join">How To Join</a>
+      <a class="btn btn-ghost" href="https://discord.gg/rexsmp" target="_blank" rel="noopener">Join Discord</a>
+    </div>
+
+    <div class="scroll-hint" aria-hidden="true">
+      <span>Scroll</span>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+    </div>
+  </header>
+
+  <section class="section" id="stats">
+    <div class="section-head">
+      <h2>Stats</h2>
+      <p>Live server status</p>
+    </div>
+    <div class="stats-grid">
+      <article class="stat-card stat-live">
+        <div class="stat-icon online-dot" aria-hidden="true"></div>
+        <div class="stat-body">
+          <span class="stat-value" id="players-online">—</span>
+          <span class="stat-label">Players Online</span>
+        </div>
+      </article>
+      <article class="stat-card">
+        <div class="stat-icon">⚔</div>
+        <div class="stat-body">
+          <span class="stat-value">Raids ON</span>
+          <span class="stat-label">No Land Claims</span>
+        </div>
+      </article>
+      <article class="stat-card">
+        <div class="stat-icon">🌐</div>
+        <div class="stat-body">
+          <span class="stat-value">Java + Bedrock</span>
+          <span class="stat-label">Crossplay Enabled</span>
+        </div>
+      </article>
+      <article class="stat-card">
+        <div class="stat-icon">💎</div>
+        <div class="stat-body">
+          <span class="stat-value">RexShards</span>
+          <span class="stat-label">Premium Economy</span>
+        </div>
+      </article>
+    </div>
+    <p class="stat-status" id="server-status">Checking server…</p>
+  </section>
+
+  <section class="section section-alt" id="join">
+    <div class="section-head">
+      <h2>How To Join</h2>
+      <p>Pick your platform and jump in</p>
+    </div>
+    <div class="join-grid">
+      <article class="join-card">
+        <div class="join-platform">Java Edition</div>
+        <ol class="join-steps">
+          <li>Open Minecraft Java (1.20+)</li>
+          <li>Click <strong>Multiplayer</strong> → <strong>Add Server</strong></li>
+          <li>Paste: <code>rexsmp.simpleminecrafthosting.com</code></li>
+          <li>Join and type <code>/rtp</code> to start exploring</li>
+        </ol>
+        <button class="copy-btn copy-btn-block" type="button" data-copy="rexsmp.simpleminecrafthosting.com">Copy Java IP</button>
+      </article>
+      <article class="join-card">
+        <div class="join-platform bedrock">Bedrock Edition</div>
+        <ol class="join-steps">
+          <li>Open Minecraft Bedrock / Pocket Edition</li>
+          <li>Go to <strong>Play</strong> → <strong>Servers</strong> → <strong>Add Server</strong></li>
+          <li>Server: <code>69.41.172.83</code> · Port: <code>25691</code></li>
+          <li>Save and connect — same world as Java players</li>
+        </ol>
+        <button class="copy-btn copy-btn-block" type="button" data-copy="69.41.172.83:25691">Copy Bedrock IP</button>
+      </article>
+    </div>
+  </section>
+
+  <section class="section" id="features">
+    <div class="section-head">
+      <h2>Features</h2>
+      <p>Donut-style survival — built for PvP and economy</p>
+    </div>
+    <div class="features-grid">
+      <article class="feature-card">
+        <span class="feature-icon">🏴</span>
+        <h3>Base Raiding</h3>
+        <p>Raiding is allowed. No land claims — protect your base with traps, not plugins.</p>
+      </article>
+      <article class="feature-card">
+        <span class="feature-icon">💰</span>
+        <h3>Dual Economy</h3>
+        <p><code>/shop</code> for money and <code>/rexshop</code> for RexShards. Sell, trade, and grind.</p>
+      </article>
+      <article class="feature-card">
+        <span class="feature-icon">📦</span>
+        <h3>Auction House</h3>
+        <p>List items on <code>/ah</code> and browse player orders with <code>/orders</code>.</p>
+      </article>
+      <article class="feature-card">
+        <span class="feature-icon">🎁</span>
+        <h3>Crate Keys</h3>
+        <p>Common, Rare, and Legendary crates at spawn. Keys from RexShards and events.</p>
+      </article>
+      <article class="feature-card">
+        <span class="feature-icon">⚡</span>
+        <h3>Random Teleport</h3>
+        <p><code>/rtp</code> sends you 500–5000 blocks out. Find a spot and build your empire.</p>
+      </article>
+      <article class="feature-card">
+        <span class="feature-icon">🎤</span>
+        <h3>Proximity Voice</h3>
+        <p>Talk to nearby players in-game with Simple Voice Chat. No Discord required.</p>
+      </article>
+      <article class="feature-card">
+        <span class="feature-icon">👥</span>
+        <h3>Teams & Duels</h3>
+        <p>Form a team with <code>/team</code> or 1v1 with <code>/duels</code> at spawn.</p>
+      </article>
+      <article class="feature-card">
+        <span class="feature-icon">🔮</span>
+        <h3>Rex Tools</h3>
+        <p>RexDrill, RexSellAxe, custom sidebar, stats, and more — exclusive Rex SMP plugins.</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="section section-alt" id="store">
+    <div class="section-head">
+      <h2>Store</h2>
+      <p>Support the server — ranks and RexShards coming soon</p>
+    </div>
+    <div class="store-grid">
+      <article class="store-card store-featured">
+        <div class="store-tag">Coming Soon</div>
+        <h3>Rex+ Rank</h3>
+        <ul class="store-perks">
+          <li>Extra homes</li>
+          <li>Priority queue</li>
+          <li>Faster RTP cooldown</li>
+          <li>Exclusive chat prefix</li>
+        </ul>
+        <button class="btn btn-disabled" disabled>Sold Out</button>
+      </article>
+      <article class="store-card">
+        <div class="store-tag">RexShards</div>
+        <h3>Shard Packs</h3>
+        <ul class="store-perks">
+          <li>Spawners & PvP gear</li>
+          <li>Crate keys</li>
+          <li>RexShop exclusives</li>
+        </ul>
+        <button class="btn btn-disabled" disabled>Coming Soon</button>
+      </article>
+      <article class="store-card">
+        <div class="store-tag">Keys</div>
+        <h3>Crate Keys</h3>
+        <ul class="store-perks">
+          <li>Common Key</li>
+          <li>Rare Key</li>
+          <li>Legendary Key</li>
+        </ul>
+        <button class="btn btn-disabled" disabled>Coming Soon</button>
+      </article>
+    </div>
+    <p class="store-note">Want a Tebex store like DonutSMP? Set up Tebex and link it here — the layout is ready.</p>
+  </section>
+
+  <section class="discord-banner">
+    <div class="discord-inner">
+      <div>
+        <h2>Join the Community</h2>
+        <p>Events, updates, support, and giveaways on Discord.</p>
+      </div>
+      <a class="btn btn-primary btn-lg" href="https://discord.gg/rexsmp" target="_blank" rel="noopener">discord.gg/rexsmp</a>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="footer-brand">
+      <span class="brand-star">✦</span> REX SMP
+    </div>
+    <p>Not affiliated with Mojang or Microsoft.</p>
+    <div class="footer-links">
+      <a href="#top">Top</a>
+      <a href="#join">Join</a>
+      <a href="https://discord.gg/rexsmp" target="_blank" rel="noopener">Discord</a>
+    </div>
+  </footer>
+
+  <div class="toast" id="toast" role="status" aria-live="polite">Copied!</div>
+
+  <script src="js/main.js"></script>
+</body>
+</html>
