@@ -32,7 +32,7 @@ if (-not (Test-Path ".git")) {
     git branch -M main
 }
 
-git add index.html css js CNAME .nojekyll robots.txt sitemap.xml .well-known deploy.ps1 protect-cloudflare.ps1
+git add index.html css js favicon.svg CNAME .nojekyll robots.txt sitemap.xml .well-known deploy.ps1 protect-cloudflare.ps1 PROTECT-NOW.bat DEPLOY-NOW.bat
 $pending = git status --porcelain
 if ($pending) {
     git -c "user.name=$owner" -c "user.email=$gitEmail" commit -m "Rex SMP website for $Domain"

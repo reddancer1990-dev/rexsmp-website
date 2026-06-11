@@ -90,9 +90,27 @@ body {
   text-decoration: none;
 }
 
-.brand-star {
-  color: var(--gold);
-  font-size: 1.1rem;
+.brand-logo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.65rem;
+  height: 1.65rem;
+  border-radius: 6px;
+  background: var(--red-dark);
+  color: #fff;
+  font-size: 0.95rem;
+  font-weight: 800;
+  line-height: 1;
+  box-shadow: 0 0 12px rgba(170, 0, 0, 0.45);
+}
+
+.brand-logo-sm {
+  width: 1.35rem;
+  height: 1.35rem;
+  font-size: 0.8rem;
+  vertical-align: middle;
+  margin-right: 0.35rem;
 }
 
 .nav-links {
@@ -260,6 +278,17 @@ body {
   font-size: clamp(0.85rem, 2.5vw, 1rem);
   color: var(--gold-light);
   word-break: break-all;
+}
+
+.ip-note {
+  padding: 0 1.25rem 1rem;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  text-align: left;
+}
+
+.ip-note strong {
+  color: var(--gold-light);
 }
 
 .copy-btn {
@@ -607,6 +636,51 @@ body {
   font-family: ui-monospace, monospace;
   font-size: 0.9em;
   color: var(--shard-start);
+}
+
+/* Commands */
+.commands-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.command-group {
+  padding: 1.5rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.command-group h3 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--gold);
+  margin-bottom: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.command-group ul {
+  list-style: none;
+}
+
+.command-group li {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  margin-bottom: 0.45rem;
+  line-height: 1.5;
+}
+
+.command-group code {
+  font-family: ui-monospace, monospace;
+  font-size: 0.88em;
+  color: var(--gold-light);
+  background: rgba(255, 217, 61, 0.08);
+  padding: 0.08rem 0.3rem;
+  border-radius: 4px;
 }
 
 /* Store */

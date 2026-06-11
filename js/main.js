@@ -3,6 +3,7 @@
 
   const SERVER_HOST = "rexsmp.simpleminecrafthosting.com";
   const SERVER_PORT = 33751;
+  const JAVA_ADDRESS = SERVER_HOST + ":" + SERVER_PORT;
 
   // Copy buttons
   document.querySelectorAll("[data-copy]").forEach(function (btn) {
@@ -87,7 +88,7 @@
           if (playersEl) {
             playersEl.textContent = count + " / " + max;
           }
-          setStatus("Server is online · " + SERVER_HOST, "online");
+          setStatus("Server is online · " + JAVA_ADDRESS, "online");
         } else {
           if (playersEl) playersEl.textContent = "Offline";
           setStatus("Server appears offline — try again later", "offline");
@@ -110,7 +111,7 @@
                   (data.players && data.players.online) + " / " +
                   (data.players && data.players.max);
               }
-              setStatus("Server is online · " + SERVER_HOST, "online");
+              setStatus("Server is online · " + JAVA_ADDRESS, "online");
             } else {
               if (playersEl) playersEl.textContent = "Offline";
               setStatus("Could not reach server status API", "offline");
