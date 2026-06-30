@@ -31,12 +31,13 @@ export function CustomizeView({ state, onUpdate, onReset }: CustomizeViewProps) 
   const [exporting, setExporting] = useState(false)
 
   const thumbUrls = useMemo(() => {
+    if (section !== 'wallpapers') return {} as Record<string, string>
     const map: Record<string, string> = {}
     for (const wp of WALLPAPERS) {
       map[wp.id] = wallpaperToDataUrl(wp.id, 120, 260)
     }
     return map
-  }, [])
+  }, [section])
 
   const handleShare = async () => {
     setExporting(true)
