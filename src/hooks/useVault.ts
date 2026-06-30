@@ -39,16 +39,26 @@ export function useVault() {
 
   const activeNote = notes.find((n) => n.id === activeNoteId) ?? null
 
-  const updateNoteContent = useCallback(
-    async (id: string, content: string) => {
-      const note = notes.find((n) => n.id === id)
-      if (!note) return
+  const updateNoteContent = useCallback((id: string, content: string) => {
+    setNotes((prev) => {
+      const note = prev.find((n) => n.id === id)
+      if (!note) return prev
       const updated = { ...note, content, updatedAt: Date.now() }
-      await saveNote(updated)
-      setNotes((prev) => prev.map((n) => (n.id === id ? updated : n)))
-    },
-    [notes],
-  )
+      saveNote(updated)
+      return prev.map((n) => (n.id === id ? updated : n))
+    })
+  }, [])
+
+  const updateNoteTitle = useCallback((id: string, title: string) => {
+    setNotes((prev) => {
+      const note = prev.find((n) => n.id === id)
+      if (!note) return prev
+      const trimmed = title.trim() || 'Untitled'
+      const updated = { ...note, title: trimmed, updatedAt: Date.now() }
+      saveNote(updated)
+      return prev.map((n) => (n.id === id ? updated : n))
+    })
+  }, [])
 
   const addNote = useCallback(
     async (folder = '') => {
@@ -126,6 +136,7 @@ export function useVault() {
     setActiveNoteId,
     loading,
     updateNoteContent,
+    updateNoteTitle,
     addNote,
     removeNote,
     renameNoteById,

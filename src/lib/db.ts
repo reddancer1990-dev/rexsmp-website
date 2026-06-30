@@ -28,25 +28,23 @@ export async function seedWelcomeNote(): Promise<void> {
       folder: '',
       createdAt: now,
       updatedAt: now,
-      content: `# Welcome to Vault Notes
+      content: `# Welcome to RexNotes
 
-Your personal knowledge base — works like **Obsidian**, optimized for iPhone.
+Your personal knowledge base — like **Obsidian**, with a red theme and full customization.
 
-You're reading the **Welcome** note — a starter guide that ships with the app. Tap **Edit** at the bottom to write your own notes in Markdown, or tap **Preview** (where you are now) to read them beautifully formatted.
+Tap **Read** to view notes · **Edit** to write · **Settings** to change colors, fonts, and graph style.
 
 ## Quick start
 
-- **Files** — browse and create notes
-- **Edit** — write in Markdown
-- **Preview** — read rendered notes
-- **Graph** — see how notes connect
-- **Search** — find anything instantly
+- **Files** — browse notes
+- **Edit** — write Markdown
+- **Read** — preview rendered notes
+- **Graph** — stylish node map
+- **Settings** — customize everything
 
-Use \`[[Wiki Links]]\` to connect ideas and #tags anywhere in your notes.
+Use \`[[Wiki Links]]\` and #tags in your notes.
 
-## Try it
-
-Tap [[Getting Started]] to open your next note.`,
+Tap [[Getting Started]] to continue.`,
     },
     {
       id: crypto.randomUUID(),

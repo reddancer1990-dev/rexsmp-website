@@ -1,3 +1,5 @@
+export type MobileView = 'files' | 'edit' | 'preview' | 'graph' | 'search' | 'settings'
+
 export interface Note {
   id: string
   title: string
@@ -12,8 +14,6 @@ export interface Folder {
   name: string
   parent: string
 }
-
-export type MobileView = 'files' | 'edit' | 'preview' | 'graph' | 'search'
 
 export interface GraphNode {
   id: string
@@ -32,3 +32,5 @@ export interface VaultExport {
   folders: Folder[]
   exportedAt: number
 }
+
+export type { AppSettings } from '../lib/settings'

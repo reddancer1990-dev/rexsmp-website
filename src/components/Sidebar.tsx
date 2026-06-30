@@ -59,7 +59,7 @@ export function Sidebar({
   return (
     <aside className="sidebar">
       <div className="sidebar-header">
-        <h2>Vault</h2>
+        <h2>RexNotes</h2>
         <button type="button" className="icon-btn" onClick={onClose} aria-label="Close sidebar">
           ✕
         </button>
