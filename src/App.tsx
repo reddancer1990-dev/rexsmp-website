@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { AnimatedTitle, AnimatedView } from './components/AnimatedView'
 import { BacklinksPanel } from './components/BacklinksPanel'
 import { Editor } from './components/Editor'
 import { GraphView } from './components/GraphView'
@@ -9,6 +10,8 @@ import { Sidebar } from './components/Sidebar'
 import { useVault } from './hooks/useVault'
 import type { MobileView } from './types'
 import './styles/global.css'
+
+const VIEW_ORDER: MobileView[] = ['edit', 'preview', 'graph']
 
 function useIsDesktop() {
   const [desktop, setDesktop] = useState(() => window.matchMedia('(min-width: 768px)').matches)
@@ -21,19 +24,58 @@ function useIsDesktop() {
   return desktop
 }
 
+function viewDirection(from: MobileView, to: MobileView): 'forward' | 'back' | 'fade' {
+  const a = VIEW_ORDER.indexOf(from)
+  const b = VIEW_ORDER.indexOf(to)
+  if (a < 0 || b < 0 || a === b) return 'fade'
+  return b > a ? 'forward' : 'back'
+}
+
 function App() {
   const vault = useVault()
   const isDesktop = useIsDesktop()
-  const [mobileView, setMobileView] = useState<MobileView>('edit')
+  const [mobileView, setMobileView] = useState<MobileView>('preview')
+  const [slideDir, setSlideDir] = useState<'forward' | 'back' | 'fade'>('fade')
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [sidebarClosing, setSidebarClosing] = useState(false)
   const [searchOpen, setSearchOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [menuOpen, setMenuOpen] = useState(false)
   const [desktopPane, setDesktopPane] = useState<'edit' | 'preview' | 'split'>('split')
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const importRef = useRef<HTMLInputElement>(null)
+  const prevView = useRef<MobileView>('preview')
 
   const showSidebar = isDesktop || sidebarOpen
+
+  const closeSidebar = useCallback(() => {
+    if (isDesktop) return
+    setSidebarClosing(true)
+    setTimeout(() => {
+      setSidebarOpen(false)
+      setSidebarClosing(false)
+    }, 320)
+  }, [isDesktop])
+
+  const openSidebar = useCallback(() => {
+    setSidebarClosing(false)
+    setSidebarOpen(true)
+  }, [])
+
+  const navigateView = useCallback((view: MobileView) => {
+    if (view === 'files') {
+      openSidebar()
+      return
+    }
+    if (view === 'search') {
+      setSearchOpen(true)
+      return
+    }
+    setSlideDir(viewDirection(prevView.current, view))
+    prevView.current = view
+    setMobileView(view)
+    closeSidebar()
+  }, [closeSidebar, openSidebar])
 
   const handleContentChange = useCallback(
     (content: string) => {
@@ -55,25 +97,13 @@ function App() {
     [vault],
   )
 
-  const handleMobileNav = useCallback((view: MobileView) => {
-    if (view === 'files') {
-      setSidebarOpen(true)
-      return
-    }
-    if (view === 'search') {
-      setSearchOpen(true)
-      return
-    }
-    setMobileView(view)
-  }, [])
-
   const handleWikiLink = useCallback(
     async (title: string) => {
       await vault.openNoteByTitle(title)
       if (isDesktop) setDesktopPane('preview')
-      else setMobileView('preview')
+      else navigateView('preview')
     },
-    [vault, isDesktop],
+    [vault, isDesktop, navigateView],
   )
 
   const handleTagClick = useCallback((tag: string) => {
@@ -107,6 +137,14 @@ function App() {
     [vault],
   )
 
+  const selectNote = useCallback(
+    (id: string, openPreview = !isDesktop) => {
+      vault.setActiveNoteId(id)
+      if (openPreview && !isDesktop) navigateView('preview')
+    },
+    [vault, isDesktop, navigateView],
+  )
+
   useEffect(() => {
     return () => {
       if (saveTimer.current) clearTimeout(saveTimer.current)
@@ -116,42 +154,43 @@ function App() {
   if (vault.loading) {
     return (
       <div className="app loading-screen">
-        <div className="loader">Loading vault…</div>
+        <div className="loader-ring" aria-hidden />
+        <div className="loader">Opening vault…</div>
       </div>
     )
   }
 
   const note = vault.activeNote
+  const navHighlight: MobileView = searchOpen ? 'search' : sidebarOpen ? 'files' : mobileView
 
   const sidebar = (
     <Sidebar
       notes={vault.notes}
       folders={vault.folders}
       activeNoteId={vault.activeNoteId}
-      onSelectNote={(id) => {
-        vault.setActiveNoteId(id)
-        if (!isDesktop) {
-          setMobileView('edit')
-          setSidebarOpen(false)
-        }
-      }}
+      onSelectNote={(id) => selectNote(id, true)}
       onCreateNote={() => vault.addNote()}
       onCreateFolder={() => {
         const name = prompt('Folder name')
         if (name) vault.addFolder(name)
       }}
       onDeleteNote={vault.removeNote}
-      onClose={() => setSidebarOpen(false)}
+      onClose={closeSidebar}
     />
   )
 
   return (
     <div className={`app ${isDesktop ? 'desktop' : 'mobile'}`}>
       {showSidebar && !isDesktop && (
-        <div className="sidebar-backdrop" onClick={() => setSidebarOpen(false)} />
+        <div
+          className={`sidebar-backdrop ${sidebarClosing ? 'closing' : ''}`}
+          onClick={closeSidebar}
+        />
       )}
       {showSidebar && (
-        <div className={isDesktop ? 'sidebar-desktop' : 'sidebar-mobile'}>{sidebar}</div>
+        <div className={`${isDesktop ? 'sidebar-desktop' : 'sidebar-mobile'} ${sidebarClosing ? 'closing' : ''}`}>
+          {sidebar}
+        </div>
       )}
 
       <div className="app-body">
@@ -159,42 +198,31 @@ function App() {
           <button
             type="button"
             className="icon-btn menu-btn"
-            onClick={() => setSidebarOpen(true)}
+            onClick={openSidebar}
             aria-label="Open files"
           >
             ☰
           </button>
-          <h1 className="top-title">{note?.title ?? 'Vault Notes'}</h1>
+          <AnimatedTitle title={note?.title ?? 'Vault Notes'} />
           <div className="top-actions">
             {isDesktop && (
               <div className="desktop-tabs">
-                <button
-                  type="button"
-                  className={desktopPane === 'edit' ? 'active' : ''}
-                  onClick={() => setDesktopPane('edit')}
-                >
-                  Edit
-                </button>
-                <button
-                  type="button"
-                  className={desktopPane === 'split' ? 'active' : ''}
-                  onClick={() => setDesktopPane('split')}
-                >
-                  Split
-                </button>
-                <button
-                  type="button"
-                  className={desktopPane === 'preview' ? 'active' : ''}
-                  onClick={() => setDesktopPane('preview')}
-                >
-                  Preview
-                </button>
+                {(['edit', 'split', 'preview'] as const).map((pane) => (
+                  <button
+                    key={pane}
+                    type="button"
+                    className={desktopPane === pane ? 'active' : ''}
+                    onClick={() => setDesktopPane(pane)}
+                  >
+                    {pane.charAt(0).toUpperCase() + pane.slice(1)}
+                  </button>
+                ))}
                 <button type="button" onClick={() => setSearchOpen(true)}>
                   Search
                 </button>
                 <button
                   type="button"
-                  onClick={() => setMobileView('graph')}
+                  onClick={() => navigateView('graph')}
                   className={mobileView === 'graph' ? 'active' : ''}
                 >
                   Graph
@@ -208,7 +236,7 @@ function App() {
           {menuOpen && (
             <>
               <div className="menu-backdrop" onClick={() => setMenuOpen(false)} />
-              <div className="dropdown-menu">
+              <div className="dropdown-menu anim-scale-in">
                 <button type="button" onClick={() => vault.addNote()}>
                   New note
                 </button>
@@ -235,32 +263,41 @@ function App() {
         </header>
 
         <main className="main-content">
-          {(isDesktop && mobileView === 'graph') || (!isDesktop && mobileView === 'graph') ? (
-            <GraphView
-              notes={vault.notes}
-              activeNoteId={vault.activeNoteId}
-              onSelectNote={(id) => {
-                vault.setActiveNoteId(id)
-                if (isDesktop) {
-                  setMobileView('edit')
-                  setDesktopPane('split')
-                } else setMobileView('preview')
-              }}
-            />
+          {mobileView === 'graph' ? (
+            <AnimatedView viewKey={`graph-${vault.activeNoteId}`} direction="fade" className="view-full">
+              <GraphView
+                notes={vault.notes}
+                activeNoteId={vault.activeNoteId}
+                onSelectNote={(id) => {
+                  selectNote(id, true)
+                  if (isDesktop) {
+                    setDesktopPane('split')
+                  }
+                }}
+              />
+            </AnimatedView>
           ) : note ? (
-            <div
-              className={`note-panes ${isDesktop ? `desktop-${desktopPane}` : `mobile-${mobileView}`}`}
-            >
+            <div className={`note-panes ${isDesktop ? `desktop-${desktopPane}` : `mobile-${mobileView}`}`}>
               {(!isDesktop ? mobileView === 'edit' : desktopPane !== 'preview') && (
-                <Editor
-                  content={note.content}
-                  title={note.title}
-                  onChange={handleContentChange}
-                  onTitleChange={handleTitleChange}
-                />
+                <AnimatedView
+                  viewKey={`edit-${note.id}`}
+                  direction={slideDir}
+                  className="view-full"
+                >
+                  <Editor
+                    content={note.content}
+                    title={note.title}
+                    onChange={handleContentChange}
+                    onTitleChange={handleTitleChange}
+                  />
+                </AnimatedView>
               )}
               {(!isDesktop ? mobileView === 'preview' : desktopPane !== 'edit') && (
-                <>
+                <AnimatedView
+                  viewKey={`preview-${note.id}`}
+                  direction={slideDir}
+                  className="view-full"
+                >
                   <Preview
                     content={note.content}
                     onWikiLinkClick={handleWikiLink}
@@ -269,14 +306,14 @@ function App() {
                   <BacklinksPanel
                     notes={vault.notes}
                     currentNote={note}
-                    onOpenNote={(id) => vault.setActiveNoteId(id)}
+                    onOpenNote={(id) => selectNote(id, true)}
                     onTagClick={handleTagClick}
                   />
-                </>
+                </AnimatedView>
               )}
             </div>
           ) : (
-            <div className="empty-state">
+            <div className="empty-state anim-fade-in">
               <p>No note selected</p>
               <button type="button" className="action-btn" onClick={() => vault.addNote()}>
                 Create a note
@@ -285,18 +322,16 @@ function App() {
           )}
         </main>
 
-        {!isDesktop && <MobileNav active={mobileView} onChange={handleMobileNav} />}
+        {!isDesktop && (
+          <MobileNav active={mobileView} highlighted={navHighlight} onChange={navigateView} />
+        )}
       </div>
 
       {searchOpen && (
         <SearchModal
           notes={vault.notes}
           initialQuery={searchQuery}
-          onSelectNote={(id) => {
-            vault.setActiveNoteId(id)
-            if (!isDesktop) setMobileView('edit')
-            setSearchQuery('')
-          }}
+          onSelectNote={(id) => selectNote(id, true)}
           onClose={() => {
             setSearchOpen(false)
             setSearchQuery('')

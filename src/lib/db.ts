@@ -32,29 +32,21 @@ export async function seedWelcomeNote(): Promise<void> {
 
 Your personal knowledge base — works like **Obsidian**, optimized for iPhone.
 
+You're reading the **Welcome** note — a starter guide that ships with the app. Tap **Edit** at the bottom to write your own notes in Markdown, or tap **Preview** (where you are now) to read them beautifully formatted.
+
 ## Quick start
 
-- Tap **Files** to browse notes
-- Tap **Edit** to write in Markdown
-- Tap **Preview** to see rendered notes
-- Use \`[[Wiki Links]]\` to connect ideas
-- Add #tags anywhere in your notes
+- **Files** — browse and create notes
+- **Edit** — write in Markdown
+- **Preview** — read rendered notes
+- **Graph** — see how notes connect
+- **Search** — find anything instantly
 
-## Wiki links
+Use \`[[Wiki Links]]\` to connect ideas and #tags anywhere in your notes.
 
-Try linking to [[Getting Started]] — tap it in preview to open that note.
+## Try it
 
-## Tags
-
-Notes support #productivity and #ideas tags. Search finds them too.
-
-## iPhone tip
-
-Add this app to your Home Screen: Share → **Add to Home Screen** for a full-screen experience.
-
----
-
-Happy note-taking!`,
+Tap [[Getting Started]] to open your next note.`,
     },
     {
       id: crypto.randomUUID(),

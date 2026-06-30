@@ -25,6 +25,7 @@ jobs:
           cache: npm
 
       - run: npm ci
+      - run: cp index.source.html index.html
       - run: npm run build
 
       - name: Copy built files to repo root (legacy GitHub Pages)
