@@ -1,37 +1,59 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 interface EditorProps {
-  content: string
-  title: string
-  onChange: (content: string) => void
-  onTitleChange: (title: string) => void
+  noteId: string
+  initialContent: string
+  initialTitle: string
+  onSave: (content: string) => void
+  onTitleSave: (title: string) => void
 }
 
-export function Editor({ content, title, onChange, onTitleChange }: EditorProps) {
-  const textareaRef = useRef<HTMLTextAreaElement>(null)
+export function Editor({ noteId, initialContent, initialTitle, onSave, onTitleSave }: EditorProps) {
+  const [content, setContent] = useState(initialContent)
+  const [title, setTitle] = useState(initialTitle)
+  const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const titleTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const scrollRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    const ta = textareaRef.current
-    if (!ta) return
-    ta.style.height = 'auto'
-    ta.style.height = `${ta.scrollHeight}px`
-  }, [content])
+    setContent(initialContent)
+    setTitle(initialTitle)
+    scrollRef.current?.scrollTo(0, 0)
+  }, [noteId])
+
+  useEffect(() => {
+    return () => {
+      if (saveTimer.current) clearTimeout(saveTimer.current)
+      if (titleTimer.current) clearTimeout(titleTimer.current)
+    }
+  }, [])
+
+  const handleContent = (value: string) => {
+    setContent(value)
+    if (saveTimer.current) clearTimeout(saveTimer.current)
+    saveTimer.current = setTimeout(() => onSave(value), 400)
+  }
+
+  const handleTitle = (value: string) => {
+    setTitle(value)
+    if (titleTimer.current) clearTimeout(titleTimer.current)
+    titleTimer.current = setTimeout(() => onTitleSave(value), 500)
+  }
 
   return (
-    <div className="editor-pane">
+    <div className="editor-pane" ref={scrollRef}>
       <input
         className="note-title-input"
         type="text"
         value={title}
-        onChange={(e) => onTitleChange(e.target.value)}
+        onChange={(e) => handleTitle(e.target.value)}
         placeholder="Note title"
         enterKeyHint="done"
       />
       <textarea
-        ref={textareaRef}
         className="note-editor"
         value={content}
-        onChange={(e) => onChange(e.target.value)}
+        onChange={(e) => handleContent(e.target.value)}
         placeholder="Start writing in Markdown..."
         spellCheck
         autoCapitalize="sentences"
