@@ -12,8 +12,9 @@ import {
   importVault,
   renameNote,
   saveNote,
-  seedWelcomeNote,
+  initVault,
 } from '../lib/db'
+import { isLockedNote } from '../lib/lockedNotes'
 
 export function useVault() {
   const [notes, setNotes] = useState<Note[]>([])
@@ -29,7 +30,7 @@ export function useVault() {
   }, [])
 
   useEffect(() => {
-    seedWelcomeNote()
+    initVault()
       .then(refresh)
       .then((n) => {
         setActiveNoteId((current) => current ?? n[0]?.id ?? null)
@@ -40,9 +41,10 @@ export function useVault() {
   const activeNote = notes.find((n) => n.id === activeNoteId) ?? null
 
   const updateNoteContent = useCallback((id: string, content: string) => {
+    if (isLockedNote(id)) return
     setNotes((prev) => {
       const note = prev.find((n) => n.id === id)
-      if (!note) return prev
+      if (!note || note.locked) return prev
       const updated = { ...note, content, updatedAt: Date.now() }
       saveNote(updated)
       return prev.map((n) => (n.id === id ? updated : n))
@@ -50,9 +52,10 @@ export function useVault() {
   }, [])
 
   const updateNoteTitle = useCallback((id: string, title: string) => {
+    if (isLockedNote(id)) return
     setNotes((prev) => {
       const note = prev.find((n) => n.id === id)
-      if (!note) return prev
+      if (!note || note.locked) return prev
       const trimmed = title.trim() || 'Untitled'
       const updated = { ...note, title: trimmed, updatedAt: Date.now() }
       saveNote(updated)

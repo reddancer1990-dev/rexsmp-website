@@ -4,21 +4,20 @@ interface EditorProps {
   noteId: string
   initialContent: string
   initialTitle: string
+  readOnly?: boolean
   onSave: (content: string) => void
   onTitleSave: (title: string) => void
 }
 
-export function Editor({ noteId, initialContent, initialTitle, onSave, onTitleSave }: EditorProps) {
+export function Editor({ noteId, initialContent, initialTitle, readOnly, onSave, onTitleSave }: EditorProps) {
   const [content, setContent] = useState(initialContent)
   const [title, setTitle] = useState(initialTitle)
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const titleTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const scrollRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     setContent(initialContent)
     setTitle(initialTitle)
-    scrollRef.current?.scrollTo(0, 0)
   }, [noteId])
 
   useEffect(() => {
@@ -29,19 +28,24 @@ export function Editor({ noteId, initialContent, initialTitle, onSave, onTitleSa
   }, [])
 
   const handleContent = (value: string) => {
+    if (readOnly) return
     setContent(value)
     if (saveTimer.current) clearTimeout(saveTimer.current)
     saveTimer.current = setTimeout(() => onSave(value), 400)
   }
 
   const handleTitle = (value: string) => {
+    if (readOnly) return
     setTitle(value)
     if (titleTimer.current) clearTimeout(titleTimer.current)
     titleTimer.current = setTimeout(() => onTitleSave(value), 500)
   }
 
   return (
-    <div className="editor-pane" ref={scrollRef}>
+    <div className="editor-pane">
+      {readOnly && (
+        <div className="locked-banner">🔒 Locked reference note — read only</div>
+      )}
       <input
         className="note-title-input"
         type="text"
@@ -49,15 +53,15 @@ export function Editor({ noteId, initialContent, initialTitle, onSave, onTitleSa
         onChange={(e) => handleTitle(e.target.value)}
         placeholder="Note title"
         enterKeyHint="done"
+        readOnly={readOnly}
       />
       <textarea
-        className="note-editor"
+        className={`note-editor ${readOnly ? 'read-only' : ''}`}
         value={content}
         onChange={(e) => handleContent(e.target.value)}
         placeholder="Start writing in Markdown..."
-        spellCheck
-        autoCapitalize="sentences"
-        autoCorrect="on"
+        spellCheck={!readOnly}
+        readOnly={readOnly}
       />
     </div>
   )

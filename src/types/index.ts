@@ -7,6 +7,7 @@ export interface Note {
   folder: string
   createdAt: number
   updatedAt: number
+  locked?: boolean
 }
 
 export interface Folder {
