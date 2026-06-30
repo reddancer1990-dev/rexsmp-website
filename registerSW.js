@@ -1,0 +1,1 @@
+if('serviceWorker' in navigator) {window.addEventListener('load', () => {navigator.serviceWorker.register('/rexsmp-website/sw.js', { scope: '/rexsmp-website/' })})}
