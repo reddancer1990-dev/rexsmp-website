@@ -287,9 +287,9 @@ function App() {
             </div>
           )}
         </main>
-
-        {!isDesktop && <MobileNav highlighted={navHighlight} onChange={navigateView} />}
       </div>
+
+      {!isDesktop && <MobileNav highlighted={navHighlight} onChange={navigateView} />}
 
       {searchOpen && (
         <SearchModal
