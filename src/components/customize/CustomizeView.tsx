@@ -1,11 +1,11 @@
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import {
   CLOCK_STYLE_LABELS,
   WIDGET_LEFT_LABELS,
   WIDGET_RIGHT_LABELS,
   type CustomizeState,
 } from '../../lib/customize'
-import { downloadWallpaper, WALLPAPERS, wallpaperToDataUrl } from '../../lib/wallpapers'
+import { downloadWallpaper, WALLPAPERS, WALLPAPER_PREVIEW_CLASS } from '../../lib/wallpapers'
 import { downloadAllIcons, downloadIcon, ICON_PACK } from '../../lib/iconPack'
 import { downloadLockScreen, shareLockScreen } from '../../lib/lockScreenExport'
 import { LockScreenPreview } from './LockScreenPreview'
@@ -29,15 +29,6 @@ const SECTIONS: { id: Section; label: string }[] = [
 export function CustomizeView({ state, onUpdate, onReset }: CustomizeViewProps) {
   const [section, setSection] = useState<Section>('preview')
   const [exporting, setExporting] = useState(false)
-
-  const thumbUrls = useMemo(() => {
-    if (section !== 'wallpapers') return {} as Record<string, string>
-    const map: Record<string, string> = {}
-    for (const wp of WALLPAPERS) {
-      map[wp.id] = wallpaperToDataUrl(wp.id, 120, 260)
-    }
-    return map
-  }, [section])
 
   const handleShare = async () => {
     setExporting(true)
@@ -100,7 +91,7 @@ export function CustomizeView({ state, onUpdate, onReset }: CustomizeViewProps) 
                       className={`wallpaper-card ${state.wallpaperId === wp.id ? 'selected' : ''}`}
                       onClick={() => onUpdate({ wallpaperId: wp.id })}
                     >
-                      <img src={thumbUrls[wp.id]} alt="" />
+                      <div className={WALLPAPER_PREVIEW_CLASS[wp.id]} aria-hidden />
                       <span className="wallpaper-name">{wp.name}</span>
                       <span className="wallpaper-desc">{wp.description}</span>
                     </button>

@@ -1,6 +1,6 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import type { CustomizeState } from '../../lib/customize'
-import { wallpaperToDataUrl } from '../../lib/wallpapers'
+import { WALLPAPER_PREVIEW_CLASS } from '../../lib/wallpapers'
 
 interface LockScreenPreviewProps {
   state: CustomizeState
@@ -28,21 +28,14 @@ export function LockScreenPreview({ state, compact }: LockScreenPreviewProps) {
     return () => clearInterval(id)
   }, [])
 
-  const wallpaperUrl = useMemo(
-    () => wallpaperToDataUrl(state.wallpaperId, 390, 844),
-    [state.wallpaperId],
-  )
-
   const clockClass = `lock-clock lock-clock--${state.clockStyle}`
+  const wallpaperClass = WALLPAPER_PREVIEW_CLASS[state.wallpaperId]
 
   return (
     <div className={`iphone-frame ${compact ? 'iphone-frame--compact' : ''}`}>
       <div className="iphone-bezel">
         <div className="iphone-island" aria-hidden />
-        <div
-          className="iphone-screen"
-          style={{ backgroundImage: `url(${wallpaperUrl})` }}
-        >
+        <div className={`iphone-screen ${wallpaperClass}`}>
           <div className="lock-content" style={{ color: state.accentColor }}>
             {state.showDate && <div className="lock-date">{formatDate(now)}</div>}
             <div className={clockClass}>{formatTime(now, state.use24h)}</div>
