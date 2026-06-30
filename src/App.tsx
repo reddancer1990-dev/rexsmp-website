@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { CustomizeView } from './components/customize/CustomizeView'
 import { AnimatedTitle, AnimatedView } from './components/AnimatedView'
 import { BacklinksPanel } from './components/BacklinksPanel'
 import { Editor } from './components/Editor'
@@ -9,10 +10,12 @@ import { Preview } from './components/Preview'
 import { SearchModal } from './components/SearchModal'
 import { SettingsPanel } from './components/SettingsPanel'
 import { Sidebar } from './components/Sidebar'
+import { useCustomize } from './hooks/useCustomize'
 import { useSettings } from './hooks/useSettings'
 import { useVault } from './hooks/useVault'
 import type { MobileView } from './types'
 import './styles/global.css'
+import './styles/customize.css'
 
 const VIEW_ORDER: MobileView[] = ['edit', 'preview', 'graph']
 
@@ -37,6 +40,7 @@ function viewDirection(from: MobileView, to: MobileView): 'forward' | 'back' | '
 function App() {
   const vault = useVault()
   const { settings, updateSettings, resetSettings } = useSettings()
+  const { customize, updateCustomize, resetCustomize } = useCustomize()
   const isDesktop = useIsDesktop()
   const [mobileView, setMobileView] = useState<MobileView>('preview')
   const [slideDir, setSlideDir] = useState<'forward' | 'back' | 'fade'>('fade')
@@ -155,7 +159,7 @@ function App() {
         : mobileView
 
   return (
-    <div className={`app ${isDesktop ? 'desktop' : 'mobile'} ${mobileView === 'graph' && !isDesktop ? 'graph-mode' : ''}`}>
+    <div className={`app ${isDesktop ? 'desktop' : 'mobile'} ${mobileView === 'graph' && !isDesktop ? 'graph-mode' : ''} ${mobileView === 'customize' && !isDesktop ? 'customize-mode' : ''}`}>
       {showSidebar && !isDesktop && (
         <div className={`sidebar-backdrop ${sidebarClosing ? 'closing' : ''}`} onClick={closeSidebar} />
       )}
@@ -182,7 +186,7 @@ function App() {
           <button type="button" className="icon-btn menu-btn" onClick={openSidebar} aria-label="Open files">
             ☰
           </button>
-          <AnimatedTitle title={note?.title ?? 'RexNotes'} />
+          <AnimatedTitle title={mobileView === 'customize' && !isDesktop ? 'Customize iPhone' : (note?.title ?? 'RexNotes')} />
           <div className="top-actions">
             <button type="button" className="icon-btn" onClick={() => setSearchOpen(true)} aria-label="Search">
               <IconSearch className="nav-svg" />
@@ -201,6 +205,9 @@ function App() {
                 ))}
                 <button type="button" onClick={() => navigateView('graph')} className={mobileView === 'graph' ? 'active' : ''}>
                   Graph
+                </button>
+                <button type="button" onClick={() => navigateView('customize')} className={mobileView === 'customize' ? 'active' : ''}>
+                  Style
                 </button>
                 <button type="button" onClick={() => setSettingsOpen(true)}>
                   Settings
@@ -239,8 +246,12 @@ function App() {
           )}
         </header>
 
-        <main className={`main-content ${mobileView === 'graph' ? 'graph-active' : ''}`}>
-          {mobileView === 'graph' ? (
+        <main className={`main-content ${mobileView === 'graph' ? 'graph-active' : ''} ${mobileView === 'customize' ? 'customize-active' : ''}`}>
+          {mobileView === 'customize' ? (
+            <AnimatedView viewKey="customize" direction="fade">
+              <CustomizeView state={customize} onUpdate={updateCustomize} onReset={resetCustomize} />
+            </AnimatedView>
+          ) : mobileView === 'graph' ? (
             <AnimatedView viewKey={`graph-${vault.activeNoteId}`} direction="fade">
               <GraphView
                 notes={vault.notes}

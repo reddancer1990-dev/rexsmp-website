@@ -41,6 +41,16 @@ export function IconGraph({ className }: IconProps) {
   )
 }
 
+export function IconCustomize({ className }: IconProps) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <rect x="5" y="2" width="14" height="20" rx="3" />
+      <path d="M9 18h6" />
+      <circle cx="12" cy="7" r="1.5" fill="currentColor" stroke="none" />
+    </svg>
+  )
+}
+
 export function IconSettings({ className }: IconProps) {
   return (
     <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -64,6 +74,7 @@ const TAB_ICONS: Record<MobileView, FC<IconProps>> = {
   edit: IconEdit,
   preview: IconPreview,
   graph: IconGraph,
+  customize: IconCustomize,
   settings: IconSettings,
   search: IconSearch,
 }

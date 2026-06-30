@@ -1,4 +1,4 @@
-export type MobileView = 'files' | 'edit' | 'preview' | 'graph' | 'search' | 'settings'
+export type MobileView = 'files' | 'edit' | 'preview' | 'graph' | 'search' | 'settings' | 'customize'
 
 export interface Note {
   id: string
