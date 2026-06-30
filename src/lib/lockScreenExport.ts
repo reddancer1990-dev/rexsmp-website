@@ -7,7 +7,7 @@ const EXPORT_H = 2532
 function clockFont(style: CustomizeState['clockStyle'], size: number): string {
   const map = {
     'sf-rounded': `600 ${size}px -apple-system, BlinkMacSystemFont, 'SF Pro Rounded', sans-serif`,
-    'sf-thin': `200 ${size}px -apple-system, BlinkMacSystemFont, sans-serif`,
+    'sf-thin': `100 ${size}px -apple-system, BlinkMacSystemFont, sans-serif`,
     'sf-bold': `700 ${size}px -apple-system, BlinkMacSystemFont, sans-serif`,
     mono: `500 ${size}px 'SF Mono', ui-monospace, Menlo, monospace`,
   }
@@ -107,17 +107,22 @@ export function renderLockScreen(
   ctx.fillStyle = color
   ctx.textAlign = 'center'
 
+  const isIos27 = state.layoutMode === 'ios27'
+  const dateY = height * (isIos27 ? 0.11 : 0.14)
+  const clockSize = (isIos27 ? 108 : 86) * scale
+  const clockY = height * (isIos27 ? 0.165 : 0.22)
+  const widgetY = height * (isIos27 ? 0.235 : 0.26)
+
   if (state.showDate) {
-    ctx.font = `400 ${22 * scale}px -apple-system, BlinkMacSystemFont, sans-serif`
+    ctx.font = `400 ${(isIos27 ? 20 : 22) * scale}px -apple-system, BlinkMacSystemFont, sans-serif`
     ctx.globalAlpha = 0.85
-    ctx.fillText(formatDate(date), width / 2, height * 0.14)
+    ctx.fillText(formatDate(date), width / 2, dateY)
     ctx.globalAlpha = 1
   }
 
-  ctx.font = clockFont(state.clockStyle, 86 * scale)
-  ctx.fillText(formatTime(date, state.use24h), width / 2, height * 0.22)
+  ctx.font = clockFont(state.clockStyle, clockSize)
+  ctx.fillText(formatTime(date, state.use24h), width / 2, clockY)
 
-  const widgetY = height * 0.26
   const widgetSize = 44 * scale
   const gap = 12 * scale
   const totalW = widgetSize * 2 + gap

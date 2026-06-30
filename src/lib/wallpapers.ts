@@ -1,13 +1,14 @@
-export type WallpaperId = 'dunes' | 'mountains' | 'moon' | 'delta' | 'rex-dark' | 'rex-red'
+export type WallpaperId = 'dunes' | 'mountains' | 'moon' | 'delta' | 'rex-dark' | 'rex-red' | 'black-vision'
 
 export interface WallpaperDef {
   id: WallpaperId
   name: string
-  category: 'minimal' | 'rex'
+  category: 'minimal' | 'rex' | 'vision'
   description: string
 }
 
 export const WALLPAPERS: WallpaperDef[] = [
+  { id: 'black-vision', name: 'Black Vision', category: 'vision', description: 'Mountain depth with reflection' },
   { id: 'dunes', name: 'Dunes', category: 'minimal', description: 'Soft rolling sand dunes' },
   { id: 'mountains', name: 'Peaks', category: 'minimal', description: 'Layered mountain ridges' },
   { id: 'moon', name: 'Crescent', category: 'minimal', description: 'Bare branches & moon' },
@@ -38,6 +39,7 @@ function noise(ctx: CanvasRenderingContext2D, w: number, h: number, alpha = 0.04
 
 /** CSS class for live preview — no canvas work on tab open. */
 export const WALLPAPER_PREVIEW_CLASS: Record<WallpaperId, string> = {
+  'black-vision': 'wp-preview wp-black-vision',
   dunes: 'wp-preview wp-dunes',
   mountains: 'wp-preview wp-mountains',
   moon: 'wp-preview wp-moon',
@@ -203,6 +205,71 @@ function drawDelta(ctx: CanvasRenderingContext2D, w: number, h: number) {
   noise(ctx, w, h, 0.06)
 }
 
+function drawBlackVision(ctx: CanvasRenderingContext2D, w: number, h: number) {
+  const horizon = h * 0.52
+
+  const sky = ctx.createLinearGradient(0, 0, 0, horizon)
+  sky.addColorStop(0, '#f5f5f5')
+  sky.addColorStop(0.55, '#d8d8d8')
+  sky.addColorStop(1, '#a8a8a8')
+  ctx.fillStyle = sky
+  ctx.fillRect(0, 0, w, horizon)
+
+  const peaks = [
+    { x: 0, base: horizon, top: h * 0.28, color: '#0a0a0a' },
+    { x: w * 0.15, base: horizon, top: h * 0.22, color: '#111' },
+    { x: w * 0.35, base: horizon, top: h * 0.18, color: '#1a1a1a' },
+    { x: w * 0.55, base: horizon, top: h * 0.25, color: '#0d0d0d' },
+    { x: w * 0.75, base: horizon, top: h * 0.2, color: '#141414' },
+    { x: w, base: horizon, top: h * 0.3, color: '#080808' },
+  ]
+
+  ctx.fillStyle = '#0a0a0a'
+  ctx.beginPath()
+  ctx.moveTo(0, horizon)
+  for (let i = 0; i < peaks.length - 1; i++) {
+    const a = peaks[i]
+    const b = peaks[i + 1]
+    ctx.lineTo((a.x + b.x) / 2, Math.min(a.top, b.top))
+    ctx.lineTo(b.x, b.base)
+  }
+  ctx.lineTo(w, horizon)
+  ctx.lineTo(w, 0)
+  ctx.lineTo(0, 0)
+  ctx.closePath()
+  ctx.fill()
+
+  const water = ctx.createLinearGradient(0, horizon, 0, h)
+  water.addColorStop(0, '#1a1a1a')
+  water.addColorStop(0.15, '#0d0d0d')
+  water.addColorStop(0.5, '#060606')
+  water.addColorStop(1, '#020202')
+  ctx.fillStyle = water
+  ctx.fillRect(0, horizon, w, h - horizon)
+
+  ctx.globalAlpha = 0.35
+  ctx.fillStyle = '#888'
+  ctx.beginPath()
+  ctx.moveTo(0, horizon + (h - horizon) * 0.05)
+  for (let i = 0; i < peaks.length - 1; i++) {
+    const a = peaks[i]
+    const b = peaks[i + 1]
+    const reflectTop = horizon + (Math.min(a.top, b.top) - horizon) * 0.55 + (h - horizon) * 0.08
+    ctx.lineTo((a.x + b.x) / 2, reflectTop)
+    ctx.lineTo(b.x, horizon + (h - horizon) * 0.05)
+  }
+  ctx.lineTo(w, horizon + (h - horizon) * 0.05)
+  ctx.closePath()
+  ctx.fill()
+  ctx.globalAlpha = 1
+
+  const sheen = ctx.createLinearGradient(0, horizon, 0, horizon + 4)
+  sheen.addColorStop(0, 'rgba(255,255,255,0.12)')
+  sheen.addColorStop(1, 'rgba(255,255,255,0)')
+  ctx.fillStyle = sheen
+  ctx.fillRect(0, horizon, w, 6)
+}
+
 function drawRexDark(ctx: CanvasRenderingContext2D, w: number, h: number) {
   const g = ctx.createLinearGradient(0, 0, w * 0.3, h)
   g.addColorStop(0, '#1a0a0a')
@@ -234,6 +301,7 @@ function drawRexRed(ctx: CanvasRenderingContext2D, w: number, h: number) {
 }
 
 const RENDERERS: Record<WallpaperId, (ctx: CanvasRenderingContext2D, w: number, h: number) => void> = {
+  'black-vision': drawBlackVision,
   dunes: drawDunes,
   mountains: drawMountains,
   moon: drawMoon,

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import {
   CLOCK_STYLE_LABELS,
+  LAYOUT_MODE_LABELS,
   WIDGET_LEFT_LABELS,
   WIDGET_RIGHT_LABELS,
   type CustomizeState,
@@ -8,7 +9,8 @@ import {
 import { downloadWallpaper, WALLPAPERS, WALLPAPER_PREVIEW_CLASS } from '../../lib/wallpapers'
 import { downloadAllIcons, downloadIcon, ICON_PACK } from '../../lib/iconPack'
 import { downloadLockScreen, shareLockScreen } from '../../lib/lockScreenExport'
-import { LockScreenPreview } from './LockScreenPreview'
+import { BLACK_VISION_PRESET, THEME_PRESETS } from '../../lib/themePresets'
+import { PhonePreview } from './PhonePreview'
 
 type Section = 'preview' | 'wallpapers' | 'widgets' | 'icons' | 'apply'
 
@@ -26,9 +28,19 @@ const SECTIONS: { id: Section; label: string }[] = [
   { id: 'apply', label: 'Apply' },
 ]
 
+const WALLPAPER_CATEGORIES = [
+  { id: 'vision' as const, label: 'Black Vision' },
+  { id: 'minimal' as const, label: 'Minimal B&W' },
+  { id: 'rex' as const, label: 'RexNotes' },
+]
+
 export function CustomizeView({ state, onUpdate, onReset }: CustomizeViewProps) {
   const [section, setSection] = useState<Section>('preview')
   const [exporting, setExporting] = useState(false)
+
+  const applyPreset = (presetState: CustomizeState) => {
+    onUpdate({ ...presetState })
+  }
 
   const handleShare = async () => {
     setExporting(true)
@@ -46,8 +58,24 @@ export function CustomizeView({ state, onUpdate, onReset }: CustomizeViewProps) 
       <div className="customize-header">
         <h1>Customize iPhone</h1>
         <p className="customize-sub">
-          Build a minimalist lock screen, download wallpapers &amp; icon packs, then apply on iOS.
+          Full phone makeover — lock screen, home screen icons, and dark monochrome style.
         </p>
+      </div>
+
+      <div className="preset-hero preset-hero--black-vision">
+        <div className="preset-hero-text">
+          <span className="preset-badge">Featured</span>
+          <h2>{BLACK_VISION_PRESET.name}</h2>
+          <p>{BLACK_VISION_PRESET.tagline}</p>
+          <p className="preset-desc">{BLACK_VISION_PRESET.description}</p>
+        </div>
+        <button
+          type="button"
+          className="action-btn preset-apply-btn"
+          onClick={() => applyPreset(BLACK_VISION_PRESET.state)}
+        >
+          Apply full look
+        </button>
       </div>
 
       <div className="customize-section-tabs">
@@ -66,7 +94,7 @@ export function CustomizeView({ state, onUpdate, onReset }: CustomizeViewProps) 
       <div className="customize-body">
         {section === 'preview' && (
           <div className="customize-preview-section">
-            <LockScreenPreview state={state} />
+            <PhonePreview state={state} />
             <div className="customize-preview-actions">
               <button type="button" className="action-btn" onClick={handleShare} disabled={exporting}>
                 {exporting ? 'Exporting…' : 'Save lock screen'}
@@ -74,31 +102,38 @@ export function CustomizeView({ state, onUpdate, onReset }: CustomizeViewProps) 
               <button type="button" className="ghost-btn" onClick={() => downloadLockScreen(state)}>
                 Download PNG
               </button>
+              <button type="button" className="ghost-btn" onClick={() => downloadAllIcons()}>
+                Download all icons
+              </button>
             </div>
           </div>
         )}
 
         {section === 'wallpapers' && (
           <div className="customize-wallpapers">
-            {(['minimal', 'rex'] as const).map((cat) => (
-              <div key={cat} className="wallpaper-group">
-                <h3>{cat === 'minimal' ? 'Minimal B&amp;W' : 'RexNotes themes'}</h3>
-                <div className="wallpaper-grid">
-                  {WALLPAPERS.filter((w) => w.category === cat).map((wp) => (
-                    <button
-                      key={wp.id}
-                      type="button"
-                      className={`wallpaper-card ${state.wallpaperId === wp.id ? 'selected' : ''}`}
-                      onClick={() => onUpdate({ wallpaperId: wp.id })}
-                    >
-                      <div className={WALLPAPER_PREVIEW_CLASS[wp.id]} aria-hidden />
-                      <span className="wallpaper-name">{wp.name}</span>
-                      <span className="wallpaper-desc">{wp.description}</span>
-                    </button>
-                  ))}
+            {WALLPAPER_CATEGORIES.map((cat) => {
+              const items = WALLPAPERS.filter((w) => w.category === cat.id)
+              if (items.length === 0) return null
+              return (
+                <div key={cat.id} className="wallpaper-group">
+                  <h3>{cat.label}</h3>
+                  <div className="wallpaper-grid">
+                    {items.map((wp) => (
+                      <button
+                        key={wp.id}
+                        type="button"
+                        className={`wallpaper-card ${state.wallpaperId === wp.id ? 'selected' : ''}`}
+                        onClick={() => onUpdate({ wallpaperId: wp.id, themePreset: 'custom' })}
+                      >
+                        <div className={WALLPAPER_PREVIEW_CLASS[wp.id]} aria-hidden />
+                        <span className="wallpaper-name">{wp.name}</span>
+                        <span className="wallpaper-desc">{wp.description}</span>
+                      </button>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            ))}
+              )
+            })}
             <button
               type="button"
               className="ghost-btn full-width"
@@ -112,6 +147,38 @@ export function CustomizeView({ state, onUpdate, onReset }: CustomizeViewProps) 
         {section === 'widgets' && (
           <div className="customize-options">
             <section>
+              <h3>Presets</h3>
+              <div className="preset-chips">
+                {THEME_PRESETS.map((preset) => (
+                  <button
+                    key={preset.id}
+                    type="button"
+                    className={state.themePreset === preset.id ? 'active' : ''}
+                    onClick={() => applyPreset(preset.state)}
+                  >
+                    {preset.name}
+                  </button>
+                ))}
+              </div>
+            </section>
+
+            <section>
+              <h3>Lock screen layout</h3>
+              <div className="option-chips">
+                {(Object.keys(LAYOUT_MODE_LABELS) as CustomizeState['layoutMode'][]).map((id) => (
+                  <button
+                    key={id}
+                    type="button"
+                    className={state.layoutMode === id ? 'active' : ''}
+                    onClick={() => onUpdate({ layoutMode: id, themePreset: 'custom' })}
+                  >
+                    {LAYOUT_MODE_LABELS[id]}
+                  </button>
+                ))}
+              </div>
+            </section>
+
+            <section>
               <h3>Clock</h3>
               <div className="option-chips">
                 {(Object.keys(CLOCK_STYLE_LABELS) as CustomizeState['clockStyle'][]).map((id) => (
@@ -119,7 +186,7 @@ export function CustomizeView({ state, onUpdate, onReset }: CustomizeViewProps) 
                     key={id}
                     type="button"
                     className={state.clockStyle === id ? 'active' : ''}
-                    onClick={() => onUpdate({ clockStyle: id })}
+                    onClick={() => onUpdate({ clockStyle: id, themePreset: 'custom' })}
                   >
                     {CLOCK_STYLE_LABELS[id]}
                   </button>
@@ -149,7 +216,9 @@ export function CustomizeView({ state, onUpdate, onReset }: CustomizeViewProps) 
                 <span>Left widget</span>
                 <select
                   value={state.widgetLeft}
-                  onChange={(e) => onUpdate({ widgetLeft: e.target.value as CustomizeState['widgetLeft'] })}
+                  onChange={(e) =>
+                    onUpdate({ widgetLeft: e.target.value as CustomizeState['widgetLeft'], themePreset: 'custom' })
+                  }
                 >
                   {Object.entries(WIDGET_LEFT_LABELS).map(([k, v]) => (
                     <option key={k} value={k}>{v}</option>
@@ -160,7 +229,9 @@ export function CustomizeView({ state, onUpdate, onReset }: CustomizeViewProps) 
                 <span>Right widget</span>
                 <select
                   value={state.widgetRight}
-                  onChange={(e) => onUpdate({ widgetRight: e.target.value as CustomizeState['widgetRight'] })}
+                  onChange={(e) =>
+                    onUpdate({ widgetRight: e.target.value as CustomizeState['widgetRight'], themePreset: 'custom' })
+                  }
                 >
                   {Object.entries(WIDGET_RIGHT_LABELS).map(([k, v]) => (
                     <option key={k} value={k}>{v}</option>
@@ -174,7 +245,7 @@ export function CustomizeView({ state, onUpdate, onReset }: CustomizeViewProps) 
                     type="text"
                     value={state.customQuote}
                     maxLength={24}
-                    onChange={(e) => onUpdate({ customQuote: e.target.value })}
+                    onChange={(e) => onUpdate({ customQuote: e.target.value, themePreset: 'custom' })}
                   />
                 </label>
               )}
@@ -187,7 +258,7 @@ export function CustomizeView({ state, onUpdate, onReset }: CustomizeViewProps) 
                 <input
                   type="color"
                   value={state.accentColor}
-                  onChange={(e) => onUpdate({ accentColor: e.target.value })}
+                  onChange={(e) => onUpdate({ accentColor: e.target.value, themePreset: 'custom' })}
                 />
                 <span className="color-hex">{state.accentColor}</span>
               </label>
@@ -202,7 +273,7 @@ export function CustomizeView({ state, onUpdate, onReset }: CustomizeViewProps) 
         {section === 'icons' && (
           <div className="customize-icons">
             <p className="customize-hint">
-              Minimal dark icon pack matching your lock screen. Download individually or grab the full set.
+              Carbon-dark icon pack for the Black Vision look. Tap to download, then use Shortcuts to set on Home Screen.
             </p>
             <div className="icon-grid">
               {ICON_PACK.map((icon) => (
@@ -226,42 +297,42 @@ export function CustomizeView({ state, onUpdate, onReset }: CustomizeViewProps) 
         {section === 'apply' && (
           <div className="customize-guide">
             <div className="guide-note">
-              RexNotes runs in Safari — it cannot change your iPhone system settings directly.
-              Follow these steps to apply your design on iOS.
+              RexNotes cannot change iOS directly — follow these steps to get the full Black Vision look on your iPhone.
             </div>
 
             <section className="guide-step">
               <span className="step-num">1</span>
               <div>
-                <h3>Set wallpaper</h3>
-                <p>Tap <strong>Save lock screen</strong> on the Preview tab (or download wallpaper only).</p>
-                <p>Open Photos → select the image → Share → <strong>Use as Wallpaper</strong> → Lock Screen.</p>
+                <h3>Wallpaper (lock + home)</h3>
+                <p>Tap <strong>Apply full look</strong> then <strong>Save lock screen</strong> or download the Black Vision wallpaper.</p>
+                <p>Photos → image → Share → <strong>Use as Wallpaper</strong> → set for <strong>Lock Screen</strong> and <strong>Home Screen</strong>.</p>
               </div>
             </section>
 
             <section className="guide-step">
               <span className="step-num">2</span>
               <div>
-                <h3>Customize lock screen</h3>
-                <p>Long-press the lock screen → <strong>Customize</strong> → match clock font &amp; widget layout to your preview.</p>
-                <p>Use white/minimal widgets for the clean look shown in your reference photos.</p>
+                <h3>Lock screen style</h3>
+                <p>Long-press lock screen → <strong>Customize</strong>.</p>
+                <p>Pick the <strong>thin large clock</strong>, white color, and add small widgets below the time like in the preview.</p>
               </div>
             </section>
 
             <section className="guide-step">
               <span className="step-num">3</span>
               <div>
-                <h3>Custom app icons</h3>
-                <p>Download icons from the Icons tab. Then open the <strong>Shortcuts</strong> app.</p>
-                <p>Create a shortcut: Open App → pick app → Add to Home Screen → choose your downloaded icon.</p>
+                <h3>Dark app icons</h3>
+                <p>Download all icons from the <strong>Icons</strong> tab.</p>
+                <p>Open <strong>Shortcuts</strong> → create shortcut → Open App → Add to Home Screen → pick the dark icon for each app.</p>
               </div>
             </section>
 
             <section className="guide-step">
               <span className="step-num">4</span>
               <div>
-                <h3>Add RexNotes to Home Screen</h3>
-                <p>In Safari, tap Share → <strong>Add to Home Screen</strong>. Use the RexNotes icon from the pack for a matching look.</p>
+                <h3>Finish the look</h3>
+                <p>Enable <strong>Dark Mode</strong> in Settings → Display.</p>
+                <p>Use a minimal widget stack on home screen. Hide app names in Settings if you want the clean icon-only grid.</p>
               </div>
             </section>
           </div>
