@@ -17,6 +17,7 @@ interface Particle {
   vy: number
   size: number
   alpha: number
+  phase: number
 }
 
 function dist(a: { clientX: number; clientY: number }, b: { clientX: number; clientY: number }) {
@@ -63,13 +64,14 @@ export function GraphView({ notes, activeNoteId, settings, onSelectNote }: Graph
       }
     })
     stateRef.current.edges = edges
-    stateRef.current.particles = Array.from({ length: 50 }, () => ({
+    stateRef.current.particles = Array.from({ length: Math.min(180, Math.max(90, Math.floor((w * h) / 5000))) }, () => ({
       x: Math.random() * w,
       y: Math.random() * h,
-      vx: (Math.random() - 0.5) * 0.35,
-      vy: (Math.random() - 0.5) * 0.35,
-      size: Math.random() * 2 + 0.5,
-      alpha: Math.random() * 0.45 + 0.1,
+      vx: (Math.random() - 0.5) * 0.45,
+      vy: (Math.random() - 0.5) * 0.45,
+      size: Math.random() * 2.2 + 0.4,
+      alpha: Math.random() * 0.55 + 0.15,
+      phase: Math.random() * Math.PI * 2,
     }))
   }, [notes])
 
@@ -99,6 +101,20 @@ export function GraphView({ notes, activeNoteId, settings, onSelectNote }: Graph
       canvas.style.width = `${rect.width}px`
       canvas.style.height = `${rect.height}px`
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
+      const pw = rect.width
+      const ph = rect.height
+      const n = Math.min(180, Math.max(90, Math.floor((pw * ph) / 5000)))
+      if (stateRef.current.particles.length !== n) {
+        stateRef.current.particles = Array.from({ length: n }, () => ({
+          x: Math.random() * pw,
+          y: Math.random() * ph,
+          vx: (Math.random() - 0.5) * 0.45,
+          vy: (Math.random() - 0.5) * 0.45,
+          size: Math.random() * 2.2 + 0.4,
+          alpha: Math.random() * 0.55 + 0.15,
+          phase: Math.random() * Math.PI * 2,
+        }))
+      }
     }
 
     const ro = new ResizeObserver(resize)
@@ -187,32 +203,18 @@ export function GraphView({ notes, activeNoteId, settings, onSelectNote }: Graph
       ctx.strokeStyle = `${s.graphEdge}18`
       ctx.lineWidth = 0.5 / zoom
       const grid = 40
-      for (let x = -w; x < w * 2; x += grid) {
+      const pad = Math.max(w, h) / zoom
+      for (let x = -pad; x < w + pad; x += grid) {
         ctx.beginPath()
-        ctx.moveTo(x, -h)
-        ctx.lineTo(x, h * 2)
+        ctx.moveTo(x, -pad)
+        ctx.lineTo(x, h + pad)
         ctx.stroke()
       }
-      for (let y = -h; y < h * 2; y += grid) {
+      for (let y = -pad; y < h + pad; y += grid) {
         ctx.beginPath()
-        ctx.moveTo(-w, y)
-        ctx.lineTo(w * 2, y)
+        ctx.moveTo(-pad, y)
+        ctx.lineTo(w + pad, y)
         ctx.stroke()
-      }
-
-      if (s.graphParticles) {
-        for (const p of state.particles) {
-          p.x += p.vx
-          p.y += p.vy
-          if (p.x < -20) p.x = w + 20
-          if (p.x > w + 20) p.x = -20
-          if (p.y < -20) p.y = h + 20
-          if (p.y > h + 20) p.y = -20
-          ctx.beginPath()
-          ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2)
-          ctx.fillStyle = `${s.accentLight}${Math.floor(p.alpha * 255).toString(16).padStart(2, '0')}`
-          ctx.fill()
-        }
       }
 
       for (const edge of state.edges) {
@@ -268,6 +270,32 @@ export function GraphView({ notes, activeNoteId, settings, onSelectNote }: Graph
       }
 
       ctx.restore()
+
+      // Screen-space particles — always cover full viewport when zoomed out
+      if (s.graphParticles) {
+        for (const p of state.particles) {
+          p.x += p.vx
+          p.y += p.vy
+          if (p.x < 0) p.x = w
+          if (p.x > w) p.x = 0
+          if (p.y < 0) p.y = h
+          if (p.y > h) p.y = 0
+          const twinkle = 0.55 + 0.45 * Math.sin(state.time * 1.8 + p.phase)
+          const r = p.size * twinkle
+          ctx.beginPath()
+          ctx.arc(p.x, p.y, r, 0, Math.PI * 2)
+          const a = Math.floor(p.alpha * twinkle * 255)
+          ctx.fillStyle = `${s.accentLight}${a.toString(16).padStart(2, '0')}`
+          ctx.fill()
+          if (r > 1.2) {
+            ctx.beginPath()
+            ctx.arc(p.x, p.y, r * 2.5, 0, Math.PI * 2)
+            ctx.fillStyle = `${s.accent}${Math.floor(a * 0.15).toString(16).padStart(2, '0')}`
+            ctx.fill()
+          }
+        }
+      }
+
       frame = requestAnimationFrame(tick)
     }
     frame = requestAnimationFrame(tick)

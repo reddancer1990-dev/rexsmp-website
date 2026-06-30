@@ -24,15 +24,16 @@
   --safe-bottom: env(safe-area-inset-bottom, 0px);
   --safe-left: env(safe-area-inset-left, 0px);
   --safe-right: env(safe-area-inset-right, 0px);
-  --nav-height: calc(64px + env(safe-area-inset-bottom, 0px));
-  --header-height: calc(48px + var(--safe-top));
+  --nav-bar-h: 52px;
+  --nav-safe-bottom: calc(var(--nav-bar-h) + env(safe-area-inset-bottom, 0px) + 16px);
+  --header-height: calc(48px + env(safe-area-inset-top, 0px));
   --ease-out-expo: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-out-back: cubic-bezier(0.34, 1.56, 0.64, 1);
   --duration-fast: 0.2s;
   --duration-normal: 0.35s;
   --duration-slow: 0.5s;
   font-family: var(--font-body);
-  font-size: var(--font-size-base);
+  font-size: 16px;
   line-height: 1.5;
   color: var(--text-primary);
   background: var(--bg-primary);
@@ -80,7 +81,8 @@ button {
   display: flex;
   flex-direction: column;
   height: 100dvh;
-  height: 100vh;
+  max-height: 100dvh;
+  overflow: hidden;
   background: var(--bg-primary);
 }
 
@@ -642,18 +644,28 @@ html[data-animations='off'] .nav-indicator {
   color: var(--accent-light);
 }
 
-/* Mobile nav */
+/* Mobile nav — fixed above home indicator, never scales with text size */
 .mobile-nav {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 300;
   display: flex;
-  align-items: stretch;
-  min-height: var(--nav-height);
-  padding-bottom: max(env(safe-area-inset-bottom, 0px), 10px);
-  padding-top: 6px;
+  align-items: flex-start;
+  justify-content: stretch;
+  font-size: 12px;
   background: var(--bg-secondary);
   border-top: 1px solid var(--border);
-  flex-shrink: 0;
-  z-index: 10;
-  position: relative;
+  padding-top: 8px;
+  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 14px);
+  padding-left: env(safe-area-inset-left, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
+  box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.35);
+}
+
+.app.desktop .mobile-nav {
+  display: none;
 }
 
 .nav-indicator {
@@ -674,10 +686,10 @@ html[data-animations='off'] .nav-indicator {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 3px;
-  padding: 4px 2px 2px;
-  min-height: 48px;
+  justify-content: flex-start;
+  gap: 4px;
+  padding: 2px 4px 0;
+  height: var(--nav-bar-h);
   color: var(--text-muted);
   transition: color var(--duration-normal), transform var(--duration-fast);
   position: relative;
@@ -707,7 +719,7 @@ html[data-animations='off'] .nav-indicator {
 }
 
 .nav-label {
-  font-size: 0.58rem;
+  font-size: 10px;
   font-weight: 500;
   line-height: 1.1;
   max-width: 100%;
@@ -1071,7 +1083,16 @@ html[data-animations='off'] .nav-indicator {
   display: flex;
   flex-direction: column;
   min-width: 0;
-  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.app.mobile .app-body {
+  padding-bottom: var(--nav-safe-bottom);
+}
+
+.app.mobile .graph-zoom-controls {
+  bottom: calc(var(--nav-safe-bottom) + 8px);
 }
 
 .sidebar-desktop {
@@ -1116,10 +1137,6 @@ html[data-animations='off'] .nav-indicator {
 }
 
 @media (min-width: 768px) {
-  .mobile-nav {
-    display: none;
-  }
-
   .top-bar .menu-btn {
     display: none;
   }
@@ -1147,6 +1164,8 @@ html[data-animations='off'] .nav-indicator {
   display: flex;
   flex-direction: column;
   animation: sheetUp var(--duration-normal) var(--ease-out-expo);
+  font-size: 16px;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
 .settings-header {
