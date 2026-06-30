@@ -24,6 +24,35 @@ function dist(a: { clientX: number; clientY: number }, b: { clientX: number; cli
   return Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY)
 }
 
+function parseHex(hex: string): { r: number; g: number; b: number } {
+  const h = hex.replace('#', '')
+  const full = h.length === 3 ? h.split('').map((c) => c + c).join('') : h.slice(0, 6)
+  return {
+    r: parseInt(full.slice(0, 2), 16) || 248,
+    g: parseInt(full.slice(2, 4), 16) || 113,
+    b: parseInt(full.slice(4, 6), 16) || 113,
+  }
+}
+
+function particleCount(w: number, h: number, zoom: number): number {
+  const base = Math.floor((w * h) / 2500)
+  const zoomMul = 1 / Math.max(zoom, 0.2)
+  return Math.min(400, Math.max(120, Math.floor(base * zoomMul)))
+}
+
+function fillParticles(w: number, h: number, zoom: number): Particle[] {
+  const n = particleCount(w, h, zoom)
+  return Array.from({ length: n }, () => ({
+    x: Math.random() * w,
+    y: Math.random() * h,
+    vx: (Math.random() - 0.5) * 0.55,
+    vy: (Math.random() - 0.5) * 0.55,
+    size: Math.random() * 3 + 1,
+    alpha: Math.random() * 0.5 + 0.35,
+    phase: Math.random() * Math.PI * 2,
+  }))
+}
+
 export function GraphView({ notes, activeNoteId, settings, onSelectNote }: GraphViewProps) {
   const wrapRef = useRef<HTMLDivElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -64,21 +93,19 @@ export function GraphView({ notes, activeNoteId, settings, onSelectNote }: Graph
       }
     })
     stateRef.current.edges = edges
-    stateRef.current.particles = Array.from({ length: Math.min(180, Math.max(90, Math.floor((w * h) / 5000))) }, () => ({
-      x: Math.random() * w,
-      y: Math.random() * h,
-      vx: (Math.random() - 0.5) * 0.45,
-      vy: (Math.random() - 0.5) * 0.45,
-      size: Math.random() * 2.2 + 0.4,
-      alpha: Math.random() * 0.55 + 0.15,
-      phase: Math.random() * Math.PI * 2,
-    }))
+    stateRef.current.particles = fillParticles(w, h, stateRef.current.viewport.zoom)
   }, [notes])
 
   const setZoom = useCallback((z: number) => {
     const v = stateRef.current.viewport
     v.zoom = Math.max(0.25, Math.min(4, z))
     setZoomLabel(`${Math.round(v.zoom * 100)}%`)
+    const wrap = wrapRef.current
+    if (wrap) {
+      const w = wrap.clientWidth
+      const h = wrap.clientHeight
+      stateRef.current.particles = fillParticles(w, h, v.zoom)
+    }
   }, [])
 
   useEffect(() => {
@@ -103,17 +130,9 @@ export function GraphView({ notes, activeNoteId, settings, onSelectNote }: Graph
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
       const pw = rect.width
       const ph = rect.height
-      const n = Math.min(180, Math.max(90, Math.floor((pw * ph) / 5000)))
-      if (stateRef.current.particles.length !== n) {
-        stateRef.current.particles = Array.from({ length: n }, () => ({
-          x: Math.random() * pw,
-          y: Math.random() * ph,
-          vx: (Math.random() - 0.5) * 0.45,
-          vy: (Math.random() - 0.5) * 0.45,
-          size: Math.random() * 2.2 + 0.4,
-          alpha: Math.random() * 0.55 + 0.15,
-          phase: Math.random() * Math.PI * 2,
-        }))
+      const want = particleCount(pw, ph, stateRef.current.viewport.zoom)
+      if (Math.abs(stateRef.current.particles.length - want) > 20) {
+        stateRef.current.particles = fillParticles(pw, ph, stateRef.current.viewport.zoom)
       }
     }
 
@@ -195,6 +214,40 @@ export function GraphView({ notes, activeNoteId, settings, onSelectNote }: Graph
       ctx.fillStyle = grad
       ctx.fillRect(0, 0, w, h)
 
+      const drawParticles = (layer: 'bg' | 'fg') => {
+        if (!s.graphParticles) return
+        const rgb = parseHex(s.accentLight)
+        const rgb2 = parseHex(s.accent)
+        const zoomBoost = 1 / Math.max(zoom, 0.3)
+
+        for (const p of state.particles) {
+          p.x += p.vx * (layer === 'bg' ? 0.5 : 1)
+          p.y += p.vy * (layer === 'bg' ? 0.5 : 1)
+          if (p.x < 0) p.x = w
+          if (p.x > w) p.x = 0
+          if (p.y < 0) p.y = h
+          if (p.y > h) p.y = 0
+
+          const twinkle = 0.5 + 0.5 * Math.sin(state.time * 1.6 + p.phase)
+          const r = p.size * twinkle * (layer === 'fg' ? zoomBoost : zoomBoost * 0.7)
+          const a = Math.min(0.95, p.alpha * twinkle * (layer === 'fg' ? 0.9 : 0.35) * zoomBoost)
+
+          ctx.beginPath()
+          ctx.arc(p.x, p.y, r, 0, Math.PI * 2)
+          ctx.fillStyle = `rgba(${rgb.r},${rgb.g},${rgb.b},${a})`
+          ctx.fill()
+
+          if (layer === 'fg' && r > 1) {
+            ctx.beginPath()
+            ctx.arc(p.x, p.y, r * 2.2, 0, Math.PI * 2)
+            ctx.fillStyle = `rgba(${rgb2.r},${rgb2.g},${rgb2.b},${a * 0.12})`
+            ctx.fill()
+          }
+        }
+      }
+
+      drawParticles('bg')
+
       ctx.save()
       ctx.translate(w / 2 + panX, h / 2 + panY)
       ctx.scale(zoom, zoom)
@@ -271,30 +324,7 @@ export function GraphView({ notes, activeNoteId, settings, onSelectNote }: Graph
 
       ctx.restore()
 
-      // Screen-space particles — always cover full viewport when zoomed out
-      if (s.graphParticles) {
-        for (const p of state.particles) {
-          p.x += p.vx
-          p.y += p.vy
-          if (p.x < 0) p.x = w
-          if (p.x > w) p.x = 0
-          if (p.y < 0) p.y = h
-          if (p.y > h) p.y = 0
-          const twinkle = 0.55 + 0.45 * Math.sin(state.time * 1.8 + p.phase)
-          const r = p.size * twinkle
-          ctx.beginPath()
-          ctx.arc(p.x, p.y, r, 0, Math.PI * 2)
-          const a = Math.floor(p.alpha * twinkle * 255)
-          ctx.fillStyle = `${s.accentLight}${a.toString(16).padStart(2, '0')}`
-          ctx.fill()
-          if (r > 1.2) {
-            ctx.beginPath()
-            ctx.arc(p.x, p.y, r * 2.5, 0, Math.PI * 2)
-            ctx.fillStyle = `${s.accent}${Math.floor(a * 0.15).toString(16).padStart(2, '0')}`
-            ctx.fill()
-          }
-        }
-      }
+      drawParticles('fg')
 
       frame = requestAnimationFrame(tick)
     }
@@ -379,6 +409,8 @@ export function GraphView({ notes, activeNoteId, settings, onSelectNote }: Graph
       v.zoom = Math.max(0.25, Math.min(4, v.zoom * scale))
       stateRef.current.pinchDist = d
       setZoomLabel(`${Math.round(v.zoom * 100)}%`)
+      const rect = canvas.getBoundingClientRect()
+      stateRef.current.particles = fillParticles(rect.width, rect.height, v.zoom)
     }
 
     const onTouchEnd = () => {
