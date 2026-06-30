@@ -3,6 +3,8 @@ import type { WallpaperId } from './wallpapers'
 export type ClockStyle = 'sf-rounded' | 'sf-thin' | 'sf-bold' | 'mono'
 export type WidgetLeft = 'calendar' | 'weather' | 'grid' | 'none'
 export type WidgetRight = 'hello' | 'signature' | 'quote' | 'none'
+export type LayoutMode = 'classic' | 'ios27'
+export type ThemePresetId = 'custom' | 'black-vision'
 
 export interface CustomizeState {
   wallpaperId: WallpaperId
@@ -13,17 +15,21 @@ export interface CustomizeState {
   customQuote: string
   accentColor: string
   use24h: boolean
+  layoutMode: LayoutMode
+  themePreset: ThemePresetId
 }
 
 export const DEFAULT_CUSTOMIZE: CustomizeState = {
-  wallpaperId: 'dunes',
-  clockStyle: 'sf-rounded',
+  wallpaperId: 'black-vision',
+  clockStyle: 'sf-thin',
   showDate: true,
-  widgetLeft: 'calendar',
+  widgetLeft: 'grid',
   widgetRight: 'hello',
   customQuote: 'hello',
   accentColor: '#ffffff',
   use24h: false,
+  layoutMode: 'ios27',
+  themePreset: 'black-vision',
 }
 
 const STORAGE_KEY = 'rexnotes-customize'
@@ -61,4 +67,9 @@ export const WIDGET_RIGHT_LABELS: Record<WidgetRight, string> = {
   signature: 'Signature',
   quote: 'Custom text',
   none: 'None',
+}
+
+export const LAYOUT_MODE_LABELS: Record<LayoutMode, string> = {
+  classic: 'Classic',
+  ios27: 'Large clock (iOS style)',
 }

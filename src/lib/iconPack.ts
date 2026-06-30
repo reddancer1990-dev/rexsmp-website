@@ -1,25 +1,27 @@
 export interface AppIconDef {
   id: string
   name: string
-  /** SVG path(s) or emoji fallback rendered inside icon */
   glyph: string
-  style: 'minimal' | 'rex'
+  style: 'minimal' | 'rex' | 'black-vision'
 }
 
 export const ICON_PACK: AppIconDef[] = [
-  { id: 'rexnotes', name: 'RexNotes', glyph: 'R', style: 'rex' },
-  { id: 'safari', name: 'Safari', glyph: '◎', style: 'minimal' },
-  { id: 'messages', name: 'Messages', glyph: '◉', style: 'minimal' },
-  { id: 'phone', name: 'Phone', glyph: '☎', style: 'minimal' },
-  { id: 'mail', name: 'Mail', glyph: '✉', style: 'minimal' },
-  { id: 'camera', name: 'Camera', glyph: '◫', style: 'minimal' },
-  { id: 'photos', name: 'Photos', glyph: '❀', style: 'minimal' },
-  { id: 'music', name: 'Music', glyph: '♪', style: 'minimal' },
-  { id: 'settings', name: 'Settings', glyph: '⚙', style: 'minimal' },
-  { id: 'calendar', name: 'Calendar', glyph: '31', style: 'minimal' },
-  { id: 'maps', name: 'Maps', glyph: '⌖', style: 'minimal' },
-  { id: 'notes', name: 'Notes', glyph: '≡', style: 'minimal' },
+  { id: 'rexnotes', name: 'RexNotes', glyph: 'R', style: 'black-vision' },
+  { id: 'safari', name: 'Safari', glyph: '◎', style: 'black-vision' },
+  { id: 'messages', name: 'Messages', glyph: '◉', style: 'black-vision' },
+  { id: 'phone', name: 'Phone', glyph: '☎', style: 'black-vision' },
+  { id: 'mail', name: 'Mail', glyph: '✉', style: 'black-vision' },
+  { id: 'camera', name: 'Camera', glyph: '◫', style: 'black-vision' },
+  { id: 'photos', name: 'Photos', glyph: '❀', style: 'black-vision' },
+  { id: 'music', name: 'Music', glyph: '♪', style: 'black-vision' },
+  { id: 'settings', name: 'Settings', glyph: '⚙', style: 'black-vision' },
+  { id: 'calendar', name: 'Calendar', glyph: '31', style: 'black-vision' },
+  { id: 'maps', name: 'Maps', glyph: '⌖', style: 'black-vision' },
+  { id: 'notes', name: 'Notes', glyph: '≡', style: 'black-vision' },
 ]
+
+/** Icons shown on the home screen preview grid. */
+export const HOME_SCREEN_ICONS: AppIconDef[] = ICON_PACK.slice(0, 12)
 
 function renderIconCanvas(icon: AppIconDef, size: number): HTMLCanvasElement {
   const canvas = document.createElement('canvas')
@@ -33,6 +35,11 @@ function renderIconCanvas(icon: AppIconDef, size: number): HTMLCanvasElement {
     g.addColorStop(0, '#991b1b')
     g.addColorStop(1, '#450a0a')
     ctx.fillStyle = g
+  } else if (icon.style === 'black-vision') {
+    const g = ctx.createLinearGradient(0, 0, size, size * 0.6)
+    g.addColorStop(0, '#1a1a1a')
+    g.addColorStop(1, '#050505')
+    ctx.fillStyle = g
   } else {
     ctx.fillStyle = '#1a1a1a'
   }
@@ -45,8 +52,9 @@ function renderIconCanvas(icon: AppIconDef, size: number): HTMLCanvasElement {
   roundRect(ctx, size * 0.02, size * 0.02, size * 0.96, size * 0.96, r * 0.9)
   ctx.stroke()
 
-  ctx.fillStyle = icon.style === 'rex' ? '#fca5a5' : '#f0f0f0'
-  ctx.font = `600 ${size * 0.38}px -apple-system, BlinkMacSystemFont, sans-serif`
+  ctx.fillStyle =
+    icon.style === 'rex' ? '#fca5a5' : icon.style === 'black-vision' ? '#e8e8e8' : '#f0f0f0'
+  ctx.font = `300 ${size * 0.36}px -apple-system, BlinkMacSystemFont, sans-serif`
   ctx.textAlign = 'center'
   ctx.textBaseline = 'middle'
   ctx.fillText(icon.glyph, size / 2, size / 2 + size * 0.02)
