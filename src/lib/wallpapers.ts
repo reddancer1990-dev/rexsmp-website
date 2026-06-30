@@ -17,15 +17,33 @@ export const WALLPAPERS: WallpaperDef[] = [
 ]
 
 function noise(ctx: CanvasRenderingContext2D, w: number, h: number, alpha = 0.04) {
+  const step = w * h > 200_000 ? 3 : 1
   const img = ctx.createImageData(w, h)
-  for (let i = 0; i < img.data.length; i += 4) {
-    const v = Math.random() * 255
-    img.data[i] = v
-    img.data[i + 1] = v
-    img.data[i + 2] = v
-    img.data[i + 3] = alpha * 255
+  for (let y = 0; y < h; y += step) {
+    for (let x = 0; x < w; x += step) {
+      const v = Math.random() * 255
+      for (let dy = 0; dy < step && y + dy < h; dy++) {
+        for (let dx = 0; dx < step && x + dx < w; dx++) {
+          const i = ((y + dy) * w + (x + dx)) * 4
+          img.data[i] = v
+          img.data[i + 1] = v
+          img.data[i + 2] = v
+          img.data[i + 3] = alpha * 255
+        }
+      }
+    }
   }
   ctx.putImageData(img, 0, 0)
+}
+
+/** CSS class for live preview — no canvas work on tab open. */
+export const WALLPAPER_PREVIEW_CLASS: Record<WallpaperId, string> = {
+  dunes: 'wp-preview wp-dunes',
+  mountains: 'wp-preview wp-mountains',
+  moon: 'wp-preview wp-moon',
+  delta: 'wp-preview wp-delta',
+  'rex-dark': 'wp-preview wp-rex-dark',
+  'rex-red': 'wp-preview wp-rex-red',
 }
 
 function drawDunes(ctx: CanvasRenderingContext2D, w: number, h: number) {
@@ -107,15 +125,15 @@ function drawMoon(ctx: CanvasRenderingContext2D, w: number, h: number) {
   ctx.lineCap = 'round'
 
   const branches = [
-    { x: 0.15, y: 1, angle: -0.6, len: 0.55, w: 1.2 },
-    { x: 0.05, y: 0.7, angle: -0.3, len: 0.45, w: 0.8 },
-    { x: 0.85, y: 1, angle: -2.4, len: 0.5, w: 1 },
-    { x: 0.95, y: 0.65, angle: -2.8, len: 0.4, w: 0.7 },
-    { x: 0.5, y: 1, angle: -1.57, len: 0.35, w: 0.6 },
+    { x: 0.15, y: 1, angle: -0.6, len: 0.55 },
+    { x: 0.05, y: 0.7, angle: -0.3, len: 0.45 },
+    { x: 0.85, y: 1, angle: -2.4, len: 0.5 },
+    { x: 0.95, y: 0.65, angle: -2.8, len: 0.4 },
+    { x: 0.5, y: 1, angle: -1.57, len: 0.35 },
   ]
 
   for (const b of branches) {
-    drawBranch(ctx, w * b.x, h * b.y, b.angle, h * b.len, b.w)
+    drawBranchIter(ctx, w * b.x, h * b.y, b.angle, h * b.len)
   }
 
   const mx = w * 0.52
@@ -126,45 +144,29 @@ function drawMoon(ctx: CanvasRenderingContext2D, w: number, h: number) {
   ctx.strokeStyle = '#f0f0f0'
   ctx.lineWidth = Math.max(1.5, w * 0.004)
   ctx.stroke()
-  noise(ctx, w, h, 0.05)
 }
 
-function drawBranch(
+/** Iterative branch drawing — safe on mobile (no recursion). */
+function drawBranchIter(
   ctx: CanvasRenderingContext2D,
   x: number,
   y: number,
   angle: number,
   length: number,
-  weight: number,
-  depth = 0,
 ) {
-  if (depth > 4 || length < 3) return
-
-  const segments = 8
+  ctx.beginPath()
+  ctx.moveTo(x, y)
   let cx = x
   let cy = y
   let dir = angle
-  ctx.beginPath()
-  ctx.moveTo(cx, cy)
+  const segments = 10
   for (let i = 0; i < segments; i++) {
     const segLen = length / segments
-    dir += (Math.random() - 0.5) * 0.4
+    dir += (Math.sin(i * 1.7) * 0.15)
     cx += Math.cos(dir) * segLen
     cy += Math.sin(dir) * segLen
     ctx.lineTo(cx, cy)
-    if (depth < 4 && i > 2 && Math.random() > 0.65) {
-      drawBranch(
-        ctx,
-        cx,
-        cy,
-        dir + (Math.random() - 0.5) * 1.2,
-        length * 0.35,
-        weight * 0.55,
-        depth + 1,
-      )
-    }
   }
-  ctx.lineWidth = Math.max(1, weight * 2)
   ctx.stroke()
 }
 
