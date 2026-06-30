@@ -12,7 +12,7 @@ const tabs: { id: MobileView; label: string }[] = [
   { id: 'edit', label: 'Edit' },
   { id: 'preview', label: 'Read' },
   { id: 'graph', label: 'Graph' },
-  { id: 'settings', label: 'Settings' },
+  { id: 'customize', label: 'Style' },
 ]
 
 export function MobileNav({ highlighted, onChange }: MobileNavProps) {
