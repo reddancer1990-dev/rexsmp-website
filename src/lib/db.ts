@@ -1,5 +1,10 @@
 import Dexie, { type Table } from 'dexie'
 import type { Folder, Note } from '../types'
+import {
+  isLockedNote,
+  LOCKED_SYNTAX_NOTE_ID,
+  SYNTAX_NOTE_CONTENT,
+} from './lockedNotes'
 
 class VaultDatabase extends Dexie {
   notes!: Table<Note>
@@ -15,6 +20,30 @@ class VaultDatabase extends Dexie {
 }
 
 export const db = new VaultDatabase()
+
+export async function ensureLockedNotes(): Promise<void> {
+  const existing = await db.notes.get(LOCKED_SYNTAX_NOTE_ID)
+  const now = Date.now()
+  if (!existing) {
+    await db.notes.put({
+      id: LOCKED_SYNTAX_NOTE_ID,
+      title: 'Syntax Reference',
+      folder: '',
+      locked: true,
+      createdAt: now,
+      updatedAt: now,
+      content: SYNTAX_NOTE_CONTENT,
+    })
+  } else if (!existing.locked || existing.content !== SYNTAX_NOTE_CONTENT) {
+    await db.notes.put({
+      ...existing,
+      locked: true,
+      title: 'Syntax Reference',
+      content: SYNTAX_NOTE_CONTENT,
+      updatedAt: now,
+    })
+  }
+}
 
 export async function seedWelcomeNote(): Promise<void> {
   const count = await db.notes.count()
@@ -32,17 +61,15 @@ export async function seedWelcomeNote(): Promise<void> {
 
 Your personal knowledge base — like **Obsidian**, with a red theme and full customization.
 
-Tap **Read** to view notes · **Edit** to write · **Settings** to change colors, fonts, and graph style.
+Open **Syntax Reference** (locked 🔒) anytime for \`[[links]]\`, #tags, and Markdown help.
 
 ## Quick start
 
 - **Files** — browse notes
 - **Edit** — write Markdown
 - **Read** — preview rendered notes
-- **Graph** — stylish node map
+- **Graph** — full-screen node map (pinch to zoom)
 - **Settings** — customize everything
-
-Use \`[[Wiki Links]]\` and #tags in your notes.
 
 Tap [[Getting Started]] to continue.`,
     },
@@ -54,41 +81,28 @@ Tap [[Getting Started]] to continue.`,
       updatedAt: now + 1,
       content: `# Getting Started
 
-## Create a note
+1. Open **Files** and tap **+ Note**
+2. Write in **Edit**, read in **Read**
+3. Link notes with \`[[Note Title]]\`
+4. See connections in **Graph** — pinch to zoom!
 
-1. Open **Files** (sidebar)
-2. Tap **+ Note** at the bottom
-3. Start writing
-
-## Markdown cheatsheet
-
-\`\`\`
-# Heading 1
-## Heading 2
-**bold** *italic*
-- bullet list
-1. numbered list
-> blockquote
-\`code\`
-\`\`\`
-
-## Link between notes
-
-Type \`[[Note Title]]\` to create a wiki link. If the note doesn't exist yet, tapping the link creates it.
-
-## Graph view
-
-See how your notes connect in the **Graph** tab.
-
-## Sync to PC later
-
-Use **Export vault** in the menu to save your notes, then **Import vault** on your PC.`,
+See **Syntax Reference** for every symbol and shortcut.`,
     },
   ])
 }
 
+export async function initVault(): Promise<void> {
+  await seedWelcomeNote()
+  await ensureLockedNotes()
+}
+
 export async function getAllNotes(): Promise<Note[]> {
-  return db.notes.orderBy('updatedAt').reverse().toArray()
+  const notes = await db.notes.orderBy('updatedAt').reverse().toArray()
+  return notes.sort((a, b) => {
+    if (a.locked && !b.locked) return -1
+    if (!a.locked && b.locked) return 1
+    return 0
+  })
 }
 
 export async function getNote(id: string): Promise<Note | undefined> {
@@ -102,6 +116,10 @@ export async function getNoteByTitle(title: string): Promise<Note | undefined> {
 }
 
 export async function saveNote(note: Note): Promise<void> {
+  if (note.locked || isLockedNote(note.id)) {
+    const locked = await db.notes.get(note.id)
+    if (locked?.locked) return
+  }
   await db.notes.put({ ...note, updatedAt: Date.now() })
 }
 
@@ -119,12 +137,16 @@ export async function createNote(title: string, folder = ''): Promise<Note> {
 }
 
 export async function deleteNote(id: string): Promise<void> {
+  if (isLockedNote(id)) return
+  const note = await db.notes.get(id)
+  if (note?.locked) return
   await db.notes.delete(id)
 }
 
 export async function renameNote(id: string, title: string): Promise<void> {
+  if (isLockedNote(id)) return
   const note = await db.notes.get(id)
-  if (!note) return
+  if (!note || note.locked) return
   await db.notes.put({ ...note, title: title.trim() || 'Untitled', updatedAt: Date.now() })
 }
 
@@ -146,7 +168,7 @@ export async function deleteFolder(id: string): Promise<void> {
   await db.folders.delete(id)
   const notes = await db.notes.where('folder').equals(id).toArray()
   for (const note of notes) {
-    await db.notes.put({ ...note, folder: '' })
+    if (!note.locked) await db.notes.put({ ...note, folder: '' })
   }
 }
 
@@ -166,4 +188,5 @@ export async function importVault(json: string): Promise<void> {
     if (data.folders?.length) await db.folders.bulkAdd(data.folders)
     await db.notes.bulkAdd(data.notes ?? [])
   })
+  await ensureLockedNotes()
 }

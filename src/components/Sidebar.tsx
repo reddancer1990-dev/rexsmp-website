@@ -51,9 +51,10 @@ export function Sidebar({
     })
   }
 
-  const handleDelete = (e: React.MouseEvent, id: string) => {
+  const handleDelete = (e: React.MouseEvent, note: Note) => {
     e.stopPropagation()
-    if (confirm('Delete this note?')) onDeleteNote(id)
+    if (note.locked) return
+    if (confirm('Delete this note?')) onDeleteNote(note.id)
   }
 
   return (
@@ -86,23 +87,25 @@ export function Sidebar({
             <button
               key={note.id}
               type="button"
-              className={`file-item ${note.id === activeNoteId ? 'active' : ''}`}
+              className={`file-item ${note.locked ? 'locked' : ''} ${note.id === activeNoteId ? 'active' : ''}`}
               onClick={() => {
                 onSelectNote(note.id)
                 onClose()
               }}
             >
-              <span className="file-icon">📄</span>
+              <span className="file-icon">{note.locked ? '🔒' : '📄'}</span>
               <span className="file-name">{note.title}</span>
+              {!note.locked && (
               <span
                 className="file-delete"
                 role="button"
                 tabIndex={0}
-                onClick={(e) => handleDelete(e, note.id)}
-                onKeyDown={(e) => e.key === 'Enter' && handleDelete(e as unknown as React.MouseEvent, note.id)}
+                onClick={(e) => handleDelete(e, note)}
+                onKeyDown={(e) => e.key === 'Enter' && handleDelete(e as unknown as React.MouseEvent, note)}
               >
                 🗑
               </span>
+              )}
             </button>
           ))}
 

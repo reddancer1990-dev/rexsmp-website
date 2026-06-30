@@ -155,7 +155,7 @@ function App() {
         : mobileView
 
   return (
-    <div className={`app ${isDesktop ? 'desktop' : 'mobile'}`}>
+    <div className={`app ${isDesktop ? 'desktop' : 'mobile'} ${mobileView === 'graph' && !isDesktop ? 'graph-mode' : ''}`}>
       {showSidebar && !isDesktop && (
         <div className={`sidebar-backdrop ${sidebarClosing ? 'closing' : ''}`} onClick={closeSidebar} />
       )}
@@ -239,7 +239,7 @@ function App() {
           )}
         </header>
 
-        <main className="main-content">
+        <main className={`main-content ${mobileView === 'graph' ? 'graph-active' : ''}`}>
           {mobileView === 'graph' ? (
             <AnimatedView viewKey={`graph-${vault.activeNoteId}`} direction="fade">
               <GraphView
@@ -260,6 +260,7 @@ function App() {
                     noteId={note.id}
                     initialContent={note.content}
                     initialTitle={note.title}
+                    readOnly={!!note.locked}
                     onSave={(c) => vault.updateNoteContent(note.id, c)}
                     onTitleSave={(t) => vault.updateNoteTitle(note.id, t)}
                   />
