@@ -11,6 +11,7 @@ interface SearchModalProps {
 
 export function SearchModal({ notes, onSelectNote, onClose, initialQuery = '' }: SearchModalProps) {
   const [query, setQuery] = useState(initialQuery)
+  const [closing, setClosing] = useState(false)
 
   const results = useMemo(() => {
     const q = query.trim().toLowerCase()
@@ -25,9 +26,22 @@ export function SearchModal({ notes, onSelectNote, onClose, initialQuery = '' }:
     })
   }, [notes, query])
 
+  const handleClose = () => {
+    setClosing(true)
+    setTimeout(onClose, 280)
+  }
+
+  const handleSelect = (id: string) => {
+    setClosing(true)
+    setTimeout(() => {
+      onSelectNote(id)
+      onClose()
+    }, 200)
+  }
+
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="search-modal" onClick={(e) => e.stopPropagation()}>
+    <div className={`modal-overlay ${closing ? 'closing' : ''}`} onClick={handleClose}>
+      <div className={`search-modal ${closing ? 'closing' : ''}`} onClick={(e) => e.stopPropagation()}>
         <div className="search-modal-header">
           <input
             type="search"
@@ -38,7 +52,7 @@ export function SearchModal({ notes, onSelectNote, onClose, initialQuery = '' }:
             autoFocus
             enterKeyHint="search"
           />
-          <button type="button" className="icon-btn" onClick={onClose}>
+          <button type="button" className="icon-btn" onClick={handleClose}>
             ✕
           </button>
         </div>
@@ -46,15 +60,12 @@ export function SearchModal({ notes, onSelectNote, onClose, initialQuery = '' }:
           {results.length === 0 ? (
             <li className="search-empty">No results</li>
           ) : (
-            results.map((note) => (
-              <li key={note.id}>
+            results.map((note, i) => (
+              <li key={note.id} style={{ animationDelay: `${i * 40}ms` }} className="search-result-row">
                 <button
                   type="button"
                   className="search-result-item"
-                  onClick={() => {
-                    onSelectNote(note.id)
-                    onClose()
-                  }}
+                  onClick={() => handleSelect(note.id)}
                 >
                   <strong>{note.title}</strong>
                   <span className="search-snippet">
