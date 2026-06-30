@@ -136,7 +136,10 @@ function drawBranch(
   angle: number,
   length: number,
   weight: number,
+  depth = 0,
 ) {
+  if (depth > 4 || length < 3) return
+
   const segments = 8
   let cx = x
   let cy = y
@@ -149,8 +152,16 @@ function drawBranch(
     cx += Math.cos(dir) * segLen
     cy += Math.sin(dir) * segLen
     ctx.lineTo(cx, cy)
-    if (Math.random() > 0.55 && i > 2) {
-      drawBranch(ctx, cx, cy, dir + (Math.random() - 0.5) * 1.2, segLen * 1.8, weight * 0.5)
+    if (depth < 4 && i > 2 && Math.random() > 0.65) {
+      drawBranch(
+        ctx,
+        cx,
+        cy,
+        dir + (Math.random() - 0.5) * 1.2,
+        length * 0.35,
+        weight * 0.55,
+        depth + 1,
+      )
     }
   }
   ctx.lineWidth = Math.max(1, weight * 2)
