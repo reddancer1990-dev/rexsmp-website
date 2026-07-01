@@ -1,18 +1,16 @@
 export interface DarkIconDef {
   id: string
   name: string
-  /** Short label for preview grid */
   label: string
 }
 
-/** Dark minimalist icon pack — matches Black Vision home screen aesthetic. */
 export const DARK_ICON_APPS: DarkIconDef[] = [
   { id: 'safari', name: 'Safari', label: 'Safari' },
   { id: 'phone', name: 'Phone', label: 'Phone' },
   { id: 'messages', name: 'Messages', label: 'Messages' },
   { id: 'whatsapp', name: 'WhatsApp', label: 'WhatsApp' },
   { id: 'chatgpt', name: 'ChatGPT', label: 'ChatGPT' },
-  { id: 'cursor', name: 'Cursor', label: 'Cursor' },
+  { id: 'cursor', name: 'Cursor AI', label: 'Cursor' },
   { id: 'vercel', name: 'Vercel', label: 'Vercel' },
   { id: 'code', name: 'Code', label: 'Code' },
   { id: 'reddit', name: 'Reddit', label: 'Reddit' },
@@ -30,98 +28,173 @@ export const DARK_ICON_APPS: DarkIconDef[] = [
   { id: 'rexnotes', name: 'RexNotes', label: 'RexNotes' },
 ]
 
+/** Glyphs centered on 0,0 in a 56×56 box — rendered inside translate(50,50). */
 const GLYPHS: Record<string, string> = {
-  safari: `<circle cx="50" cy="50" r="28" fill="none" stroke="#ececec" stroke-width="2.5"/>
-    <polygon points="50,28 58,58 50,50 42,58" fill="#ececec"/>
-    <circle cx="50" cy="50" r="3" fill="#ececec"/>`,
+  safari: `
+    <circle cx="0" cy="0" r="22" fill="none" stroke="#ffffff" stroke-width="2.8"/>
+    <path d="M0,-14 L5,8 L0,3 L-5,8 Z" fill="#ffffff"/>
+    <circle cx="0" cy="0" r="2.5" fill="#ffffff"/>`,
 
-  phone: `<path d="M34 28h14c2 0 4 2 4 4v36c0 2-2 4-4 4H34c-2 0-4-2-4-4V32c0-2 2-4 4-4z" fill="none" stroke="#ececec" stroke-width="2.5" stroke-linejoin="round"/>
-    <path d="M38 68h6" stroke="#ececec" stroke-width="2.5" stroke-linecap="round"/>`,
+  phone: `
+    <rect x="-11" y="-20" width="22" height="40" rx="4" fill="none" stroke="#ffffff" stroke-width="2.8"/>
+    <line x1="-4" y1="16" x2="4" y2="16" stroke="#ffffff" stroke-width="2.8" stroke-linecap="round"/>`,
 
-  messages: `<path d="M28 32h44c3 0 6 3 6 6v22c0 3-3 6-6 6H42l-10 10v-10H28c-3 0-6-3-6-6V38c0-3 3-6 6-6z" fill="none" stroke="#ececec" stroke-width="2.5" stroke-linejoin="round"/>`,
+  messages: `
+    <path d="M-20,-14 H20 A6,6 0 0 1 26,-8 V8 A6,6 0 0 1 20,14 H-4 L-14,22 V14 H-20 A6,6 0 0 1 -26,8 V-8 A6,6 0 0 1 -20,-14 Z"
+      fill="none" stroke="#ffffff" stroke-width="2.8" stroke-linejoin="round"/>`,
 
-  whatsapp: `<path d="M28 32h44c3 0 6 3 6 6v22c0 3-3 6-6 6H42l-10 10v-10H28c-3 0-6-3-6-6V38c0-3 3-6 6-6z" fill="none" stroke="#ececec" stroke-width="2.2" stroke-linejoin="round"/>
-    <path d="M38 44c0 8 6 14 12 14 2 0 4-.5 5.5-1.5l5 2-1.5-5c1-1.5 1.5-3.5 1.5-5.5 0-6-6-12-12-12s-12 6-12 12z" fill="none" stroke="#ececec" stroke-width="2" stroke-linecap="round"/>`,
+  whatsapp: `
+    <path d="M-20,-14 H20 A6,6 0 0 1 26,-8 V8 A6,6 0 0 1 20,14 H-4 L-14,22 V14 H-20 A6,6 0 0 1 -26,8 V-8 A6,6 0 0 1 -20,-14 Z"
+      fill="none" stroke="#ffffff" stroke-width="2.6" stroke-linejoin="round"/>
+    <path d="M-8,-2 A10,10 0 1 1 8,10 L12,14 L10,8 A10,10 0 0 0 -8,-2 Z"
+      fill="none" stroke="#ffffff" stroke-width="2.4" stroke-linejoin="round"/>`,
 
-  chatgpt: `<path d="M50 24c-14 0-24 10-24 22 0 8 4 15 11 19l-3 11 11-4c3 1 6 1.5 9 1.5 14 0 24-10 24-22S64 24 50 24z" fill="none" stroke="#ececec" stroke-width="2.2" stroke-linejoin="round"/>
-    <path d="M36 50h28M50 36v28" stroke="#ececec" stroke-width="2" stroke-linecap="round" opacity="0.5"/>`,
+  chatgpt: `
+    <path d="M0,-22 C-14,-22 -22,-12 -22,0 C-22,8 -18,14 -12,18 L-14,24 L-6,21 C-4,21 -2,22 0,22 C14,22 22,12 22,0 C22,-12 14,-22 0,-22 Z"
+      fill="none" stroke="#ffffff" stroke-width="2.6" stroke-linejoin="round"/>
+    <path d="M-10,0 H10 M0,-10 V10" stroke="#ffffff" stroke-width="2" stroke-linecap="round" opacity="0.45"/>`,
 
-  cursor: `<path d="M32 28 L32 68 L44 56 L54 72 L60 68 L50 52 L68 52 Z" fill="#ececec" stroke="#ececec" stroke-width="1" stroke-linejoin="round"/>
-    <circle cx="58" cy="38" r="6" fill="none" stroke="#ececec" stroke-width="2"/>` ,
+  /** Cursor AI — isometric 3D prism (IDE logo, not a mouse pointer). */
+  cursor: `
+    <polygon points="0,-18 16,-8 16,12 0,22 -16,12 -16,-8" fill="#888888"/>
+    <polygon points="0,-18 16,-8 0,2 -16,-8" fill="#ffffff"/>
+    <polygon points="0,2 16,-8 16,12 0,22" fill="#e8e8e8"/>
+    <polygon points="0,2 -16,-8 -16,12 0,22" fill="#c8c8c8"/>`,
 
-  vercel: `<polygon points="50,26 72,68 28,68" fill="none" stroke="#ececec" stroke-width="2.5" stroke-linejoin="round"/>
-    <polygon points="50,38 62,62 38,62" fill="#ececec" opacity="0.35"/>`,
+  vercel: `
+    <polygon points="0,-22 20,22 -20,22" fill="none" stroke="#ffffff" stroke-width="2.8" stroke-linejoin="round"/>
+    <polygon points="0,-8 12,16 -12,16" fill="#ffffff" opacity="0.9"/>`,
 
-  code: `<path d="M38 32 L24 50 L38 68" fill="none" stroke="#ececec" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="M62 32 L76 50 L62 68" fill="none" stroke="#ececec" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="M54 28 L46 72" stroke="#ececec" stroke-width="2.5" stroke-linecap="round"/>`,
+  code: `
+    <path d="M-10,-16 L-22,0 L-10,16" fill="none" stroke="#ffffff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M10,-16 L22,0 L10,16" fill="none" stroke="#ffffff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+    <line x1="6" y1="-20" x2="-2" y2="20" stroke="#ffffff" stroke-width="2.8" stroke-linecap="round"/>`,
 
-  reddit: `<circle cx="50" cy="52" r="22" fill="none" stroke="#ececec" stroke-width="2.5"/>
-    <circle cx="42" cy="48" r="4" fill="#ececec"/><circle cx="58" cy="48" r="4" fill="#ececec"/>
-    <path d="M44 58 Q50 64 56 58" fill="none" stroke="#ececec" stroke-width="2" stroke-linecap="round"/>
-    <circle cx="38" cy="34" r="5" fill="none" stroke="#ececec" stroke-width="2"/>
-    <circle cx="62" cy="34" r="5" fill="none" stroke="#ececec" stroke-width="2"/>
-    <path d="M43 34h14" stroke="#ececec" stroke-width="2" stroke-linecap="round"/>`,
+  reddit: `
+    <circle cx="0" cy="2" r="18" fill="none" stroke="#ffffff" stroke-width="2.8"/>
+    <circle cx="-7" cy="-2" r="3.5" fill="#ffffff"/>
+    <circle cx="7" cy="-2" r="3.5" fill="#ffffff"/>
+    <path d="M-8,8 Q0,14 8,8" fill="none" stroke="#ffffff" stroke-width="2.4" stroke-linecap="round"/>
+    <circle cx="-12" cy="-16" r="4" fill="none" stroke="#ffffff" stroke-width="2.4"/>
+    <circle cx="12" cy="-16" r="4" fill="none" stroke="#ffffff" stroke-width="2.4"/>
+    <line x1="-8" y1="-16" x2="8" y2="-16" stroke="#ffffff" stroke-width="2.4" stroke-linecap="round"/>`,
 
-  pinterest: `<circle cx="50" cy="50" r="28" fill="none" stroke="#ececec" stroke-width="2.5"/>
-    <path d="M50 30c-8 0-14 6-14 14 0 6 4 11 9 13-1-4 1-9 4-12 0 6 4 10 9 10 8 0 14-6 14-14s-6-14-14-14z" fill="#ececec"/>`,
+  pinterest: `
+    <circle cx="0" cy="0" r="22" fill="none" stroke="#ffffff" stroke-width="2.8"/>
+    <path d="M0,-14 C-8,-14 -14,-8 -14,0 C-14,6 -10,11 -4,13 C-5,9 -4,4 0,0 C4,4 8,4 10,0 C12,-4 10,-10 4,-12 C2,-13 1,-14 0,-14 Z" fill="#ffffff"/>`,
 
-  tiktok: `<path d="M58 28v28c0 6-5 11-11 11s-11-5-11-11 5-11 11-11V42" fill="none" stroke="#ececec" stroke-width="2.8" stroke-linecap="round"/>
-    <path d="M58 28c3 3 7 5 12 5" fill="none" stroke="#ececec" stroke-width="2.8" stroke-linecap="round"/>`,
+  tiktok: `
+    <path d="M10,-20 V8 A10,10 0 1 1 -2,8" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round"/>
+    <path d="M10,-20 C14,-16 18,-14 22,-14" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round"/>`,
 
-  discord: `<path d="M32 36c8-4 16-6 18-6s10 2 18 6c0 0 6 12 6 24 0 0-6 6-12 8l-4-6c-4 2-8 3-12 3s-8-1-12-3l-4 6c-6-2-12-8-12-8 0-12 6-24 6-24z" fill="none" stroke="#ececec" stroke-width="2.2" stroke-linejoin="round"/>
-    <circle cx="42" cy="52" r="4" fill="#ececec"/><circle cx="58" cy="52" r="4" fill="#ececec"/>`,
+  discord: `
+    <path d="M-22,-8 C-12,-14 0,-16 0,-16 S12,-14 22,-8 C22,-8 28,6 28,18 C28,18 22,24 14,26 L10,20 C2,22 -2,22 -10,20 L-14,26 C-22,24 -28,18 -28,18 C-28,6 -22,-8 -22,-8 Z"
+      fill="none" stroke="#ffffff" stroke-width="2.6" stroke-linejoin="round"/>
+    <circle cx="-8" cy="6" r="4" fill="#ffffff"/>
+    <circle cx="8" cy="6" r="4" fill="#ffffff"/>`,
 
-  soundcloud: `<path d="M28 58c0-8 6-14 14-14 3 0 6 1 8 3 2-6 8-10 15-10 9 0 16 7 16 16 0 3-.8 5.5-2.2 7.8" fill="none" stroke="#ececec" stroke-width="2.5" stroke-linecap="round"/>
-    <path d="M32 58v-8M36 58v-12M40 58v-16M44 58v-10M48 58v-14" stroke="#ececec" stroke-width="2.5" stroke-linecap="round"/>`,
+  soundcloud: `
+    <path d="M-22,12 C-22,2 -14,-6 -4,-6 C0,-6 4,-4 6,-2 C8,-10 16,-16 26,-16 C36,-16 44,-8 44,2 C44,6 43,9 41,12"
+      fill="none" stroke="#ffffff" stroke-width="2.8" stroke-linecap="round"/>
+    <line x1="-18" y1="12" x2="-18" y2="0" stroke="#ffffff" stroke-width="3" stroke-linecap="round"/>
+    <line x1="-12" y1="12" x2="-12" y2="-6" stroke="#ffffff" stroke-width="3" stroke-linecap="round"/>
+    <line x1="-6" y1="12" x2="-6" y2="-10" stroke="#ffffff" stroke-width="3" stroke-linecap="round"/>
+    <line x1="0" y1="12" x2="0" y2="-4" stroke="#ffffff" stroke-width="3" stroke-linecap="round"/>`,
 
-  music: `<path d="M58 30v28M58 30L38 38v20" fill="none" stroke="#ececec" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-    <circle cx="34" cy="58" r="6" fill="none" stroke="#ececec" stroke-width="2.5"/>
-    <circle cx="54" cy="50" r="6" fill="none" stroke="#ececec" stroke-width="2.5"/>`,
+  music: `
+    <line x1="12" y1="-18" x2="12" y2="10" stroke="#ffffff" stroke-width="2.8" stroke-linecap="round"/>
+    <line x1="12" y1="-18" x2="-6" y2="-10" stroke="#ffffff" stroke-width="2.8" stroke-linecap="round"/>
+    <line x1="-6" y1="-10" x2="-6" y2="10" stroke="#ffffff" stroke-width="2.8" stroke-linecap="round"/>
+    <circle cx="-6" cy="14" r="5" fill="none" stroke="#ffffff" stroke-width="2.8"/>
+    <circle cx="12" cy="6" r="5" fill="none" stroke="#ffffff" stroke-width="2.8"/>`,
 
-  contacts: `<circle cx="50" cy="38" r="12" fill="none" stroke="#ececec" stroke-width="2.5"/>
-    <path d="M28 68c0-12 10-20 22-20s22 8 22 20" fill="none" stroke="#ececec" stroke-width="2.5" stroke-linecap="round"/>`,
+  contacts: `
+    <circle cx="0" cy="-8" r="10" fill="none" stroke="#ffffff" stroke-width="2.8"/>
+    <path d="M-18,18 C-18,4 -8,-4 0,-4 S18,4 18,18" fill="none" stroke="#ffffff" stroke-width="2.8" stroke-linecap="round"/>`,
 
-  mail: `<rect x="26" y="34" width="48" height="32" rx="4" fill="none" stroke="#ececec" stroke-width="2.5"/>
-    <path d="M26 38l24 18 24-18" fill="none" stroke="#ececec" stroke-width="2.5" stroke-linejoin="round"/>`,
+  mail: `
+    <rect x="-22" y="-12" width="44" height="30" rx="4" fill="none" stroke="#ffffff" stroke-width="2.8"/>
+    <path d="M-22,-8 L0,8 L22,-8" fill="none" stroke="#ffffff" stroke-width="2.8" stroke-linejoin="round"/>`,
 
-  camera: `<rect x="28" y="36" width="44" height="32" rx="4" fill="none" stroke="#ececec" stroke-width="2.5"/>
-    <circle cx="50" cy="52" r="10" fill="none" stroke="#ececec" stroke-width="2.5"/>
-    <circle cx="62" cy="42" r="3" fill="#ececec"/>`,
+  camera: `
+    <rect x="-20" y="-10" width="40" height="28" rx="4" fill="none" stroke="#ffffff" stroke-width="2.8"/>
+    <circle cx="0" cy="4" r="9" fill="none" stroke="#ffffff" stroke-width="2.8"/>
+    <circle cx="14" cy="-4" r="2.5" fill="#ffffff"/>`,
 
-  photos: `<rect x="28" y="32" width="44" height="36" rx="4" fill="none" stroke="#ececec" stroke-width="2.5"/>
-    <circle cx="40" cy="46" r="4" fill="#ececec"/>
-    <path d="M28 60l12-12 10 10 8-8 16 16" fill="none" stroke="#ececec" stroke-width="2.5" stroke-linejoin="round"/>`,
+  photos: `
+    <rect x="-20" y="-14" width="40" height="32" rx="4" fill="none" stroke="#ffffff" stroke-width="2.8"/>
+    <circle cx="-8" cy="-2" r="3.5" fill="#ffffff"/>
+    <path d="M-20,12 L-6,0 L4,10 L12,2 L20,12" fill="none" stroke="#ffffff" stroke-width="2.8" stroke-linejoin="round"/>`,
 
-  settings: `<circle cx="50" cy="50" r="10" fill="none" stroke="#ececec" stroke-width="2.5"/>
-    <path d="M50 26v6M50 68v6M26 50h6M68 50h6M33 33l4 4M63 63l4 4M33 67l4-4M63 37l4-4" stroke="#ececec" stroke-width="2.5" stroke-linecap="round"/>`,
+  settings: `
+    <circle cx="0" cy="0" r="8" fill="none" stroke="#ffffff" stroke-width="2.8"/>
+    <line x1="0" y1="-20" x2="0" y2="-12" stroke="#ffffff" stroke-width="2.8" stroke-linecap="round"/>
+    <line x1="0" y1="12" x2="0" y2="20" stroke="#ffffff" stroke-width="2.8" stroke-linecap="round"/>
+    <line x1="-20" y1="0" x2="-12" y2="0" stroke="#ffffff" stroke-width="2.8" stroke-linecap="round"/>
+    <line x1="12" y1="0" x2="20" y2="0" stroke="#ffffff" stroke-width="2.8" stroke-linecap="round"/>
+    <line x1="-14" y1="-14" x2="-9" y2="-9" stroke="#ffffff" stroke-width="2.8" stroke-linecap="round"/>
+    <line x1="9" y1="9" x2="14" y2="14" stroke="#ffffff" stroke-width="2.8" stroke-linecap="round"/>
+    <line x1="-14" y1="14" x2="-9" y2="9" stroke="#ffffff" stroke-width="2.8" stroke-linecap="round"/>
+    <line x1="9" y1="-9" x2="14" y2="-14" stroke="#ffffff" stroke-width="2.8" stroke-linecap="round"/>`,
 
-  notes: `<rect x="30" y="28" width="40" height="44" rx="4" fill="none" stroke="#ececec" stroke-width="2.5"/>
-    <path d="M38 42h24M38 52h24M38 62h16" stroke="#ececec" stroke-width="2.5" stroke-linecap="round"/>`,
+  notes: `
+    <rect x="-16" y="-20" width="32" height="40" rx="4" fill="none" stroke="#ffffff" stroke-width="2.8"/>
+    <line x1="-8" y1="-8" x2="8" y2="-8" stroke="#ffffff" stroke-width="2.8" stroke-linecap="round"/>
+    <line x1="-8" y1="2" x2="8" y2="2" stroke="#ffffff" stroke-width="2.8" stroke-linecap="round"/>
+    <line x1="-8" y1="12" x2="4" y2="12" stroke="#ffffff" stroke-width="2.8" stroke-linecap="round"/>`,
 
-  rexnotes: `<rect x="30" y="28" width="40" height="44" rx="4" fill="none" stroke="#f87171" stroke-width="2.5"/>
-    <path d="M42 48h16M42 58h12" stroke="#f87171" stroke-width="2.5" stroke-linecap="round"/>
-    <text x="50" y="44" text-anchor="middle" fill="#f87171" font-size="14" font-family="system-ui,sans-serif" font-weight="600">R</text>`,
+  rexnotes: `
+    <rect x="-16" y="-20" width="32" height="40" rx="4" fill="none" stroke="#f87171" stroke-width="2.8"/>
+    <text x="0" y="-4" text-anchor="middle" fill="#f87171" font-size="16" font-family="system-ui,sans-serif" font-weight="700">R</text>
+    <line x1="-8" y1="6" x2="8" y2="6" stroke="#f87171" stroke-width="2.8" stroke-linecap="round"/>
+    <line x1="-8" y1="14" x2="4" y2="14" stroke="#f87171" stroke-width="2.8" stroke-linecap="round"/>`,
+}
+
+function uid(id: string): string {
+  return id.replace(/[^a-z0-9]/gi, '')
 }
 
 export function buildFullIconSvg(id: string, size = 1024): string {
   const glyph = GLYPHS[id] ?? GLYPHS.settings
+  const u = uid(id)
   const r = size * 0.223
+  const pad = size * 0.018
+  const inner = size - pad * 2
+  const innerR = r - pad * 0.5
+
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
   <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#242424"/>
-      <stop offset="100%" stop-color="#0a0a0a"/>
+    <linearGradient id="tile-${u}" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#454545"/>
+      <stop offset="12%" stop-color="#323232"/>
+      <stop offset="55%" stop-color="#1a1a1a"/>
+      <stop offset="100%" stop-color="#080808"/>
     </linearGradient>
-    <linearGradient id="shine" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="rgba(255,255,255,0.12)"/>
-      <stop offset="40%" stop-color="rgba(255,255,255,0)"/>
+    <linearGradient id="shine-${u}" x1="0" y1="0" x2="0.3" y2="1">
+      <stop offset="0%" stop-color="rgba(255,255,255,0.28)"/>
+      <stop offset="35%" stop-color="rgba(255,255,255,0.06)"/>
+      <stop offset="100%" stop-color="rgba(255,255,255,0)"/>
     </linearGradient>
+    <linearGradient id="rim-${u}" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="rgba(255,255,255,0.35)"/>
+      <stop offset="45%" stop-color="rgba(255,255,255,0.06)"/>
+      <stop offset="100%" stop-color="rgba(255,255,255,0.02)"/>
+    </linearGradient>
+    <filter id="pop-${u}" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="${size * 0.012}" stdDeviation="${size * 0.018}" flood-color="#000000" flood-opacity="0.65"/>
+    </filter>
+    <filter id="glyphGlow-${u}" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="0" dy="${size * 0.006}" stdDeviation="${size * 0.008}" flood-color="#ffffff" flood-opacity="0.55"/>
+    </filter>
   </defs>
-  <rect width="${size}" height="${size}" rx="${r}" fill="url(#bg)"/>
-  <rect x="${size * 0.02}" y="${size * 0.02}" width="${size * 0.96}" height="${size * 0.96}" rx="${r * 0.92}" fill="url(#shine)"/>
-  <rect x="${size * 0.02}" y="${size * 0.02}" width="${size * 0.96}" height="${size * 0.96}" rx="${r * 0.92}" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="${size * 0.008}"/>
-  <g transform="scale(${size / 100})">${glyph}</g>
+  <rect width="${size}" height="${size}" rx="${r}" fill="#030303"/>
+  <rect x="${pad}" y="${pad}" width="${inner}" height="${inner}" rx="${innerR}" fill="url(#tile-${u})" filter="url(#pop-${u})"/>
+  <rect x="${pad}" y="${pad}" width="${inner}" height="${inner * 0.55}" rx="${innerR}" fill="url(#shine-${u})"/>
+  <rect x="${pad}" y="${pad}" width="${inner}" height="${inner}" rx="${innerR}" fill="none" stroke="url(#rim-${u})" stroke-width="${size * 0.006}"/>
+  <rect x="${pad + size * 0.012}" y="${pad + size * 0.012}" width="${inner - size * 0.024}" height="${inner - size * 0.024}" rx="${innerR * 0.92}" fill="none" stroke="rgba(0,0,0,0.45)" stroke-width="${size * 0.004}"/>
+  <g transform="translate(${size / 2}, ${size / 2}) scale(${(size / 100) * 0.88})" filter="url(#glyphGlow-${u})">
+    ${glyph}
+  </g>
 </svg>`
 }
 
