@@ -7,7 +7,8 @@ import {
   type CustomizeState,
 } from '../../lib/customize'
 import { downloadWallpaper, WALLPAPERS, WALLPAPER_PREVIEW_CLASS } from '../../lib/wallpapers'
-import { downloadAllIcons, downloadIcon, ICON_PACK } from '../../lib/iconPack'
+import { DARK_ICON_APPS, downloadIconPackZip, downloadIconPng } from '../../lib/iconPack'
+import { renderDarkIconPreviewDataUrl } from '../../lib/darkIconArt'
 import { downloadLockScreen, shareLockScreen } from '../../lib/lockScreenExport'
 import { BLACK_VISION_PRESET, THEME_PRESETS } from '../../lib/themePresets'
 import { PhonePreview } from './PhonePreview'
@@ -37,9 +38,19 @@ const WALLPAPER_CATEGORIES = [
 export function CustomizeView({ state, onUpdate, onReset }: CustomizeViewProps) {
   const [section, setSection] = useState<Section>('preview')
   const [exporting, setExporting] = useState(false)
+  const [zipping, setZipping] = useState(false)
 
   const applyPreset = (presetState: CustomizeState) => {
     onUpdate({ ...presetState })
+  }
+
+  const handleDownloadZip = async () => {
+    setZipping(true)
+    try {
+      await downloadIconPackZip()
+    } finally {
+      setZipping(false)
+    }
   }
 
   const handleShare = async () => {
@@ -102,8 +113,8 @@ export function CustomizeView({ state, onUpdate, onReset }: CustomizeViewProps) 
               <button type="button" className="ghost-btn" onClick={() => downloadLockScreen(state)}>
                 Download PNG
               </button>
-              <button type="button" className="ghost-btn" onClick={() => downloadAllIcons()}>
-                Download all icons
+              <button type="button" className="ghost-btn" onClick={handleDownloadZip} disabled={zipping}>
+                {zipping ? 'Building zip…' : 'Download icon pack (ZIP)'}
               </button>
             </div>
           </div>
@@ -273,24 +284,37 @@ export function CustomizeView({ state, onUpdate, onReset }: CustomizeViewProps) 
         {section === 'icons' && (
           <div className="customize-icons">
             <p className="customize-hint">
-              Carbon-dark icon pack for the Black Vision look. Tap to download, then use Shortcuts to set on Home Screen.
+              21 dark minimalist icons — Safari, WhatsApp, ChatGPT, Cursor, TikTok, Discord, and more.
+              Download the ZIP and set each one via Shortcuts.
+            </p>
+            <button
+              type="button"
+              className="action-btn full-width icon-zip-btn"
+              onClick={handleDownloadZip}
+              disabled={zipping}
+            >
+              {zipping ? 'Building ZIP…' : 'Download all icons (ZIP)'}
+            </button>
+            <p className="customize-hint zip-hint">
+              Or tap an icon below to download a single PNG.
             </p>
             <div className="icon-grid">
-              {ICON_PACK.map((icon) => (
+              {DARK_ICON_APPS.map((icon) => (
                 <button
                   key={icon.id}
                   type="button"
                   className="icon-card"
-                  onClick={() => downloadIcon(icon)}
+                  onClick={() => downloadIconPng(icon.id)}
                 >
-                  <span className={`icon-preview icon-preview--${icon.style}`}>{icon.glyph}</span>
+                  <img
+                    className="icon-preview-img"
+                    src={renderDarkIconPreviewDataUrl(icon.id, 128)}
+                    alt=""
+                  />
                   <span>{icon.name}</span>
                 </button>
               ))}
             </div>
-            <button type="button" className="action-btn full-width" onClick={() => downloadAllIcons()}>
-              Download all icons
-            </button>
           </div>
         )}
 
@@ -322,8 +346,9 @@ export function CustomizeView({ state, onUpdate, onReset }: CustomizeViewProps) 
               <span className="step-num">3</span>
               <div>
                 <h3>Dark app icons</h3>
-                <p>Download all icons from the <strong>Icons</strong> tab.</p>
-                <p>Open <strong>Shortcuts</strong> → create shortcut → Open App → Add to Home Screen → pick the dark icon for each app.</p>
+                <p>Go to <strong>Icons</strong> → tap <strong>Download all icons (ZIP)</strong>.</p>
+                <p>Or download directly: <strong>black-vision-icons.zip</strong> from the site (21 PNGs + README).</p>
+                <p>Open <strong>Shortcuts</strong> → create shortcut → Open App → Add to Home Screen → pick each dark icon.</p>
               </div>
             </section>
 

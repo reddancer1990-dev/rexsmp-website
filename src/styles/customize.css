@@ -288,6 +288,18 @@
   gap: 4px;
 }
 
+.home-icon-img {
+  width: 46px;
+  height: 46px;
+  border-radius: 12px;
+  display: block;
+}
+
+.home-icon-img--dock {
+  width: 42px;
+  height: 42px;
+}
+
 .home-icon {
   width: 46px;
   height: 46px;
@@ -765,6 +777,23 @@
 .icon-card:active {
   transform: scale(0.96);
   background: var(--bg-hover);
+}
+
+.icon-preview-img {
+  width: 52px;
+  height: 52px;
+  border-radius: 12px;
+  display: block;
+}
+
+.icon-zip-btn {
+  margin-bottom: 8px;
+}
+
+.zip-hint {
+  margin: 8px 0 16px;
+  font-size: 0.78rem;
+  text-align: center;
 }
 
 .icon-preview {
