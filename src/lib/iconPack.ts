@@ -1,99 +1,92 @@
-export interface AppIconDef {
-  id: string
-  name: string
-  glyph: string
-  style: 'minimal' | 'rex' | 'black-vision'
-}
+import JSZip from 'jszip'
+import {
+  buildFullIconSvg,
+  DARK_ICON_APPS,
+  renderDarkIconBlob,
+  type DarkIconDef,
+} from './darkIconArt'
 
-export const ICON_PACK: AppIconDef[] = [
-  { id: 'rexnotes', name: 'RexNotes', glyph: 'R', style: 'black-vision' },
-  { id: 'safari', name: 'Safari', glyph: '◎', style: 'black-vision' },
-  { id: 'messages', name: 'Messages', glyph: '◉', style: 'black-vision' },
-  { id: 'phone', name: 'Phone', glyph: '☎', style: 'black-vision' },
-  { id: 'mail', name: 'Mail', glyph: '✉', style: 'black-vision' },
-  { id: 'camera', name: 'Camera', glyph: '◫', style: 'black-vision' },
-  { id: 'photos', name: 'Photos', glyph: '❀', style: 'black-vision' },
-  { id: 'music', name: 'Music', glyph: '♪', style: 'black-vision' },
-  { id: 'settings', name: 'Settings', glyph: '⚙', style: 'black-vision' },
-  { id: 'calendar', name: 'Calendar', glyph: '31', style: 'black-vision' },
-  { id: 'maps', name: 'Maps', glyph: '⌖', style: 'black-vision' },
-  { id: 'notes', name: 'Notes', glyph: '≡', style: 'black-vision' },
-]
+export type { DarkIconDef }
+export { DARK_ICON_APPS, buildFullIconSvg, renderDarkIconPreviewDataUrl } from './darkIconArt'
+export { renderDarkIconBlob }
 
-/** Icons shown on the home screen preview grid. */
-export const HOME_SCREEN_ICONS: AppIconDef[] = ICON_PACK.slice(0, 12)
+const SHORTCUTS_README = `Black Vision Dark Icon Pack
+============================
 
-function renderIconCanvas(icon: AppIconDef, size: number): HTMLCanvasElement {
-  const canvas = document.createElement('canvas')
-  canvas.width = size
-  canvas.height = size
-  const ctx = canvas.getContext('2d')!
-  const r = size * 0.22
+21 minimalist dark icons for iPhone Shortcuts.
 
-  if (icon.style === 'rex') {
-    const g = ctx.createLinearGradient(0, 0, size, size)
-    g.addColorStop(0, '#991b1b')
-    g.addColorStop(1, '#450a0a')
-    ctx.fillStyle = g
-  } else if (icon.style === 'black-vision') {
-    const g = ctx.createLinearGradient(0, 0, size, size * 0.6)
-    g.addColorStop(0, '#1a1a1a')
-    g.addColorStop(1, '#050505')
-    ctx.fillStyle = g
-  } else {
-    ctx.fillStyle = '#1a1a1a'
-  }
+HOW TO SET A CUSTOM ICON
+------------------------
+1. Save the icon PNG to Photos (or Files).
+2. Open the Shortcuts app.
+3. Tap + → Add Action → search "Open App" → pick your app.
+4. Tap the shortcut name at top → icon → Choose Photo → select the icon.
+5. Tap Share → Add to Home Screen → name it → Add.
 
-  roundRect(ctx, 0, 0, size, size, r)
-  ctx.fill()
+Repeat for each app. Use the matching filename:
+  safari.png → Safari
+  cursor.png → Cursor
+  chatgpt.png → ChatGPT
+  etc.
 
-  ctx.strokeStyle = 'rgba(255,255,255,0.08)'
-  ctx.lineWidth = size * 0.01
-  roundRect(ctx, size * 0.02, size * 0.02, size * 0.96, size * 0.96, r * 0.9)
-  ctx.stroke()
+Tip: Enable Dark Mode in Settings → Display for the full look.
+`
 
-  ctx.fillStyle =
-    icon.style === 'rex' ? '#fca5a5' : icon.style === 'black-vision' ? '#e8e8e8' : '#f0f0f0'
-  ctx.font = `300 ${size * 0.36}px -apple-system, BlinkMacSystemFont, sans-serif`
-  ctx.textAlign = 'center'
-  ctx.textBaseline = 'middle'
-  ctx.fillText(icon.glyph, size / 2, size / 2 + size * 0.02)
+/** @deprecated Use DARK_ICON_APPS */
+export const ICON_PACK = DARK_ICON_APPS.map((a) => ({
+  id: a.id,
+  name: a.name,
+  glyph: a.label.charAt(0),
+  style: 'black-vision' as const,
+}))
 
-  return canvas
-}
+export const HOME_SCREEN_ICONS = DARK_ICON_APPS.slice(0, 12)
 
-function roundRect(
-  ctx: CanvasRenderingContext2D,
-  x: number,
-  y: number,
-  w: number,
-  h: number,
-  r: number,
-) {
-  ctx.beginPath()
-  ctx.moveTo(x + r, y)
-  ctx.arcTo(x + w, y, x + w, y + h, r)
-  ctx.arcTo(x + w, y + h, x, y + h, r)
-  ctx.arcTo(x, y + h, x, y, r)
-  ctx.arcTo(x, y, x + w, y, r)
-  ctx.closePath()
-}
-
-export function iconToDataUrl(icon: AppIconDef, size = 180): string {
-  return renderIconCanvas(icon, size).toDataURL('image/png')
-}
-
-export function downloadIcon(icon: AppIconDef): void {
-  const url = iconToDataUrl(icon, 1024)
+export function downloadIcon(iconId: string): void {
+  const def = DARK_ICON_APPS.find((a) => a.id === iconId)
+  if (!def) return
+  const svg = buildFullIconSvg(iconId, 1024)
+  const blob = new Blob([svg], { type: 'image/svg+xml' })
+  const url = URL.createObjectURL(blob)
   const a = document.createElement('a')
   a.href = url
-  a.download = `rexnotes-icon-${icon.id}.png`
+  a.download = `${iconId}.svg`
   a.click()
+  URL.revokeObjectURL(url)
+}
+
+export async function downloadIconPng(iconId: string): Promise<void> {
+  const blob = await renderDarkIconBlob(iconId, 1024)
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = `${iconId}.png`
+  a.click()
+  URL.revokeObjectURL(url)
+}
+
+export async function downloadIconPackZip(): Promise<void> {
+  const zip = new JSZip()
+  const folder = zip.folder('black-vision-icons')
+  if (!folder) throw new Error('Could not create zip folder')
+
+  folder.file('README.txt', SHORTCUTS_README)
+
+  for (const app of DARK_ICON_APPS) {
+    const blob = await renderDarkIconBlob(app.id, 1024)
+    const buf = await blob.arrayBuffer()
+    folder.file(`${app.id}.png`, buf)
+  }
+
+  const content = await zip.generateAsync({ type: 'blob' })
+  const url = URL.createObjectURL(content)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = 'black-vision-icons.zip'
+  a.click()
+  URL.revokeObjectURL(url)
 }
 
 export async function downloadAllIcons(): Promise<void> {
-  for (const icon of ICON_PACK) {
-    downloadIcon(icon)
-    await new Promise((r) => setTimeout(r, 300))
-  }
+  await downloadIconPackZip()
 }

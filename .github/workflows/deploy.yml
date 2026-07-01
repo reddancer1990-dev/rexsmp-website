@@ -40,6 +40,7 @@ jobs:
           cp -r dist/assets assets
           cp dist/sw.js dist/registerSW.js dist/manifest.webmanifest ./
           cp dist/workbox-*.js ./
+          cp dist/black-vision-icons.zip ./ 2>/dev/null || cp public/black-vision-icons.zip ./
           cp public/favicon.svg public/apple-touch-icon.svg ./
           cp public/.nojekyll .nojekyll
 
@@ -47,7 +48,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add index.html assets/ sw.js registerSW.js manifest.webmanifest workbox-*.js favicon.svg apple-touch-icon.svg .nojekyll
+          git add index.html assets/ sw.js registerSW.js manifest.webmanifest workbox-*.js favicon.svg apple-touch-icon.svg .nojekyll black-vision-icons.zip
           git diff --staged --quiet && echo "No built changes to commit" || git commit -m "Deploy built site [skip ci]"
           git push
 
